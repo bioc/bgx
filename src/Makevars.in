@@ -1,0 +1,16 @@
+# these are commented out because they are prepended to the default R flags, thus overriding things like -O3
+#PKG_CXXFLAGS = @BGX_CXXFLAGS@
+#PKG_CFLAGS = @BGX_CFLAGS@
+
+PKG_CPPFLAGS = @BGX_CPPFLAGS@
+PKG_LIBS = @LIBS@
+
+all: $(SHLIB)
+
+MYCXXFLAGS=@BGX_CXXFLAGS@
+MYCFLAGS=@BGX_CFLAGS@
+
+%.o: %.cc
+	$(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) $(MYCXXFLAGS) -c $< -o $@
+%.o: %.c
+	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) $(MYCFLAGS) -c $< -o $@

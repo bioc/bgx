@@ -1,0 +1,4 @@
+useDynLib(bgx)
+
+importFrom(gcrma, compute.affinities)
+export(bgx,standalone.bgx, readOutput.bgx, plotExpressionDensity, plotDEDensity, plotDEHistogram,plotDERank, plotDiffRank)

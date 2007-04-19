@@ -1,0 +1,17 @@
+1) Install basic Bioconductor R packages. See http://bioconductor.org/docs/install-howto.html
+
+2) Install the Boost development libraries (http://boost.org)
+  - Debian/Ubuntu: apt-get install libboost-dev
+  - Fedora: yum install boost-devel
+  - Mac OS X (Macports): port install boost
+
+3) Start R
+  Replace <version> below with the appropriate string:
+  > install.packages("bgx_<version>.tar.gz",repos=NULL,type="source")
+  
+  If you have the boost libraries in non-standard directory, specify this in configure.args:
+  Replace /some/path below with the path to the boost libraries
+  > install.packages("bgx_<version>.tar.gz",repos=NULL,type="source",configure.args="--with-boost=/some/path") 
+
+
+- Ernest Turro <ernest.turro@ic.ac.uk> March 2007

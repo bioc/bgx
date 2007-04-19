@@ -1,0 +1,4 @@
+analysis.bgx            Analyse BGX output.
+bgx                     Fully Bayesian integrated approach to the
+                        analysis of Affymetrix GeneChip data
+readOutput.bgx          Read in the output from a BGX run.

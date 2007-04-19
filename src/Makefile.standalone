@@ -1,0 +1,25 @@
+CC = gcc
+CXX = g++
+MACHINE = -march=nocona
+CXXFLAGS = -pedantic -ffast-math -fomit-frame-pointer -O3 -Wall -fPIC $(MACHINE)
+CFLAGS = -std=c99 $(CXXFLAGS)
+
+bgx : bgx.o rundir.o qnorm.o sokal.o bgx_frontend.o 
+	$(CXX) $(MACHINE) bgx.o rundir.o qnorm.o sokal.o bgx_frontend.o -o bgx
+
+bgx.dll : bgx.o rundir.o qnorm.o sokal.o 
+	$(CXX) -shared -mno-cygwin bgx.o rundir.o qnorm.o sokal.o -o bgx.dll
+
+bgx.so : bgx.o rundir.o qnorm.o sokal.o 
+	$(CXX) -shared bgx.o rundir.o qnorm.o sokal.o -o bgx.so
+
+.PHONY : clean
+
+clean : 
+	rm -f bgx.o rundir.o qnorm.o sokal.o bgx_frontend.o rand.o bgx bgx.so bgx.exe bgx.dll
+
+bgx.o: bgx.cc rand.hh rundir.hh qnorm.h sokal.hh bgx_updates.hh rwm.hh bgx.hh
+rundir.o: rundir.cc rundir.hh
+sokal.o: sokal.cc sokal.hh
+bgx_frontend.o: bgx_frontend.cc bgx.hh
+qnorm.o: qnorm.c qnorm.h
