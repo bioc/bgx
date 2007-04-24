@@ -1,14 +1,14 @@
 # these are commented out because they are prepended to the default R flags, thus overriding things like -O3
-#PKG_CXXFLAGS = -O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -mpentiumpro -DUSING_R
-#PKG_CFLAGS = -O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -mpentiumpro
+#PKG_CXXFLAGS = -O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -march=nocona -DUSING_R
+#PKG_CFLAGS = -O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -march=nocona
 
 PKG_CPPFLAGS = -I/usr/include
 PKG_LIBS = -lm 
 
 all: $(SHLIB)
 
-MYCXXFLAGS=-O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -mpentiumpro -DUSING_R
-MYCFLAGS=-O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -mpentiumpro
+MYCXXFLAGS=-O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -march=nocona -DUSING_R
+MYCFLAGS=-O3 -fomit-frame-pointer -fstrict-aliasing -ffast-math -march=nocona
 
 %.o: %.cc
 	$(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) $(MYCXXFLAGS) -c $< -o $@
