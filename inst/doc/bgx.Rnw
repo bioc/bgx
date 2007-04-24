@@ -59,7 +59,6 @@ As an example, let us analyse the \Robject{Dilution} data set and save the resul
 
 <<results=hide>>=
 library(affydata)
-library(hgu95av2probe)
 library(hgu95av2cdf)
 data(Dilution)
 eset <- bgx(Dilution, samplesets=c(2,2), probeAff=F, burnin=2048, iter=8192,genes=c(12500:12600), output="all", basepath=".")
