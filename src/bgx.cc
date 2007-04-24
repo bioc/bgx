@@ -83,7 +83,8 @@ void stringcpy(char* p, const string& s) {
 
 // The following are global so that we can delete them in a separate function if there is a user interrupt in R
 static double *xave=0, *yave=0, *muave, *sacc=0, *hacc=0, *muacc=0, *sigmaacc=0, *lambdaacc=0, *etaacc=0;
-static ofstream *mu_=0, *sigma_=0, *lambda_=0, *XS=0, *YS=0;
+static ofstream *sigma_=0, *lambda_=0, *XS=0, *YS=0;
+static fstream *mu_=0;
   // Metropolis/Gibbs objects
 static  S_T *AccS;
 static  RWM<S_T,array2d> *S;
@@ -244,12 +245,13 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   // Open outoput files
   filename=run_dir+"/muave";
   muave_.open(filename.c_str());
-  mu_ = new ofstream[*conditions];
+  mu_ = new fstream[*conditions];
   string num;
   for(int j=0; j<*conditions; ++j){
     int_to_string(j+1,num);
     filename=run_dir+"/mu."+num;
-    mu_[j].open(filename.c_str());
+    // Open for in+out because we want to read these again later to calculate MCSE
+    mu_[j].open(filename.c_str(), fstream::in | fstream::out | fstream::trunc);
   }
     
   if(*output >= BGXTRACE) {
@@ -787,7 +789,6 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   fullMuTrace_.close();
 #endif
 
-  for(int c=0; c<*conditions; ++c) mu_[c].close();
 
   for(int c=0; c<*conditions; ++c){
     for(int g=0; g<*genes; ++g){
@@ -866,17 +867,16 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   }
 
   // IACT and MCSE
-  ifstream mutrace;
   ofstream mcse_((run_dir + "/MCSE").c_str());
   ofstream iact_((run_dir + "/IACT").c_str());
   for(int c=0; c < *conditions; c++) {
     double * mcse = new double[*genes * *iter/(*subsample)];
-    int_to_string(c+1,num);
-    mutrace.open((run_dir + "/mu." + num).c_str());
+
+    mu_[c].seekg(0, ios::beg);
+    
     for(int i=0; i < *iter/(*subsample); i++) {
-      for(int g=0; g < *genes; g++) mutrace >> mcse[g**iter/(*subsample) + i];
+      for(int g=0; g < *genes; g++) mu_[c] >> mcse[g**iter/(*subsample) + i];
     }
-    mutrace.close();
     for(int g=0; g < *genes; g++) {
       double var=0;
       double tau=0;
@@ -895,6 +895,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   }
   mcse_.close();
   iact_.close();
+  for(int c=0; c<*conditions; ++c) mu_[c].close();
 
   // In the parallel version, memory that is allocated by all nodes is deallocated here rather than above.
   // We do the same here for code structure compatibility.
