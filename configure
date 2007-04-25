@@ -4592,7 +4592,7 @@ case $build_os in *\ *) build_os=`echo "$build_os" | sed 's/ /-/g'`;; esac
 
 	if test "x$want_boost" = "xyes"; then
 
-		boost_lib_version_req=1.32.0
+		boost_lib_version_req=1.31.0
 		boost_lib_version_req_shorten=`expr $boost_lib_version_req : '\([0-9]*\.[0-9]*\)'`
 		boost_lib_version_req_major=`expr $boost_lib_version_req : '\([0-9]*\)'`
 		boost_lib_version_req_minor=`expr $boost_lib_version_req : '[0-9]*\.\([0-9]*\)'`
