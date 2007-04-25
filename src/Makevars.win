@@ -1,0 +1,7 @@
+# This is for gcc+win32 users (http://mingw.org)
+# You may need to change the path to the boost libraries (http://boost.org)
+
+MACHINE = -march=i386
+PKG_CXXFLAGS= -DUSING_R $(MACHINE) -ffast-math -fomit-frame-pointer -O3
+PKG_CFLAGS = $(PKG_CXXFLAGS)  -std=c99
+PKG_CPPFLAGS = -Ic:/Boost
