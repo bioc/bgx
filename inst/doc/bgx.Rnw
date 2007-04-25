@@ -112,6 +112,6 @@ plotExpressionDensity(bgxOutput, gene=10)
 Run \Rfunction{help(analysis.bgx)} for usage instructions.
 
 <<echo=F>>=
-unlink("run.*", recursive=TRUE)
+unlink("run.1", recursive=TRUE)
 @
 \end{document}
