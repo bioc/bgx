@@ -55,7 +55,7 @@ done
 AC_CHECK_LIB(m, main)
 
 # Checks for Boost libraries.
-AX_BOOST([1.32.0], BGX_CPPFLAGS="$BOOST_CPPFLAGS")
+AX_BOOST([1.31.0], BGX_CPPFLAGS="$BOOST_CPPFLAGS")
 
 # Checks for typedefs, structures, and compiler characteristics.
 #AC_HEADER_STDBOOL
