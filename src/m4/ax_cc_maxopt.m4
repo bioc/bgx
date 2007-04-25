@@ -1,3 +1,10 @@
+#####
+# Changed so we do not add -malign-double in gnu/x86, which causes 
+# runtime bus errors on my Macbook Pro for some reason
+#
+# Ernest Turro <ernest.turro@ic.ac.uk> April 2007
+#####
+
 ##### http://autoconf-archive.cryp.to/ax_cc_maxopt.html
 #
 # SYNOPSIS
@@ -146,7 +153,7 @@ if test "$ac_test_CFLAGS" != "set"; then
      CFLAGS="-O3 -fomit-frame-pointer"
 
      # -malign-double for x86 systems
-     AX_CHECK_COMPILER_FLAGS(-malign-double, CFLAGS="$CFLAGS -malign-double")
+     # AX_CHECK_COMPILER_FLAGS(-malign-double, CFLAGS="$CFLAGS -malign-double")
 
      #  -fstrict-aliasing for gcc-2.95+
      AX_CHECK_COMPILER_FLAGS(-fstrict-aliasing,

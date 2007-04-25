@@ -1,4 +1,9 @@
-# Made slight modifications so that we look for boost in /opt/local too (e.g. for Macports)
+#####
+# Made tiny modifications so that we look for boost in /opt/local too 
+# (e.g. for Macports)
+#
+# Ernest Turro <ernest.turro@ic.ac.uk> April 2007
+#####
 
 ##### http://autoconf-archive.cryp.to/ax_boost.html
 #
