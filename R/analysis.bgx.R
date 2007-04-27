@@ -357,7 +357,7 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
   
   # plotting the histogram, fitted curve and intersting points:
 
-  plot(ph,main="Choe: between",xlab=paste("#DEG:",NumberDiffGenes," up:",NumberDiffGenesLeft," down:",NumberDiffGenesRight,sep=""),cex.main=1.6,cex.lab=1.5,cex.axis=1.4)
+  plot(ph,main=substitute(paste("Histogram of P(",mu[two] - mu[one]," < 0)"),list(two=paste("g",conditions[2],sep=""),one=paste("g",conditions[1],sep=""))) ,xlab=paste("#DEG:",NumberDiffGenes," up:",NumberDiffGenesLeft," down:",NumberDiffGenesRight,sep=""),cex.main=1.6,cex.lab=1.5,cex.axis=1.4)
   lines(x,f,col=8,lwd=2)
   points(x[localMaxima],f[localMaxima],col=2,pch=1,cex=2)  # maxima: red circle
   points(x[localMinima],f[localMinima],col=4,pch=2,cex=2)  # minima: blue
