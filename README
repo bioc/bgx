@@ -1,19 +1,27 @@
-1) Install basic Bioconductor R packages (see http://bioconductor.org/docs/install-howto.html).
+## How to install bgx
 
-2) Install the hgu95av2cdf pcakage (again, see  http://bioconductor.org/docs/install-howto.html).
-
-3) Install the Boost development libraries (http://boost.org):
+1) Install the Boost development libraries (http://boost.org):
   - Debian/Ubuntu: sudo apt-get install libboost-dev
   - Fedora: sudo yum install boost-devel
   - Mac OS X (Macports): sudo port install boost
 
-4) Start R and install the bgx package:
-  > install.packages("bgx_<version>.tar.gz",repos=NULL,type="source")
-  
-  If you have the boost libraries in non-standard directory, specify this in configure.args:
-  > install.packages("bgx_<version>.tar.gz",repos=NULL,type="source",configure.args="--with-boost=/path/to/boost") 
+2) Start R and install the required Bioconductor packages:
+  > source("http://www.bioconductor.org/biocLite.R")
+  > biocLite()
+  > biocLite(c("hgu95av2cdf"))
 
-  where <version> is the bgx version and
-  /path/to/boost is the path to the boost library 
+3) Install the bgx package:
+
+  - From Bioconductor:
+    > biocLite("bgx")
+
+  - From source tarball:
+    > install.packages("bgx_<version>.tar.gz",repos=NULL,type="source")
+  
+    If you have the boost libraries in non-standard directory, specify this in configure.args:
+    > install.packages("bgx_<version>.tar.gz",repos=NULL,type="source",configure.args="--with-boost=/path/to/boost") 
+
+    where <version> is the bgx version and
+    /path/to/boost is the path to the boost library 
 
 - Ernest Turro <ernest.turro@ic.ac.uk> April 2007

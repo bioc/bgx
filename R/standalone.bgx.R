@@ -118,7 +118,7 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
     "Tau_jmp 1.5\n",
     "Lambda_jmp 0.04\n",
     "Eta_jmp 0.1\n",
-    "CELfiles ", paste(sampleNames(aData), collapse=" "),
+    "CELfiles ", paste(sampleNames(aData), collapse=" "), "\n",
     if(probeAff)"affinityPlotFile ", if(probeAff)affinityPlotFile, sep=""),
     file=file.path(dirname,"infile.txt"),append=TRUE)
 
