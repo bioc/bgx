@@ -26,11 +26,14 @@ readOutput.bgx <- function(path) {
   summary <- as.vector(summary[[1]])
   noOfConditions <- as.numeric(summary[[2]])
   noOfGenes <- as.numeric(summary[[4]])
+  subsample <- as.numeric(summary[[8]])
+  iter <- as.numeric(summary[[10]])
+  traceLength <- iter/subsample
   
   mu <- list() 
   for(m in 1:noOfConditions) {
     cat("Reading mu under condition ", m, "...", sep="")
-    mu[[m]] <- matrix(scan(file.path(path, paste("mu.",m,sep=""))), ncol=1024)
+    mu[[m]] <- matrix(scan(file.path(path, paste("mu.",m,sep=""))), ncol=traceLength)
   }
   cat("Reading mu average...")
   muave <- matrix(scan(file.path(path, "muave")), ncol=noOfConditions)
