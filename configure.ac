@@ -16,7 +16,7 @@
 
 
 # Initialise.
-AC_INIT([bgx], [1.1.1], [ernest.turro@ic.ac.uk])
+AC_INIT([bgx], [1.1.2], [ernest.turro@ic.ac.uk])
 AC_CONFIG_SRCDIR([src/bgx.cc])
 #AC_CONFIG_HEADERS([src/config.h])
 
@@ -35,7 +35,12 @@ CXX=`"${R_HOME}/bin/R" CMD config CXX`
 #CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
 
 # Add optimisation flags.
-AX_CC_MAXOPT
+#AX_CC_MAXOPT
+# Catering for gnu only
+AX_CHECK_COMPILER_FLAGS(-ffast-math,CFLAGS="$CFLAGS -ffast-math")
+AX_CHECK_COMPILER_FLAGS(-fomit-frame-pointer,CFLAGS="$CFLAGS -fomit-frame-pointer")
+AX_CHECK_COMPILER_FLAGS(-O3,CFLAGS="$CFLAGS -O3")
+AX_GCC_ARCHFLAG([no])
 BGX_CFLAGS=$CFLAGS
 BGX_CXXFLAGS=$CFLAGS
 
