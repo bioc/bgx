@@ -12,8 +12,8 @@
 # PARTICULAR PURPOSE.
 
 m4_include([src/m4/ax_boost.m4])
-m4_include([src/m4/ax_cc_maxopt.m4])
+#m4_include([src/m4/ax_cc_maxopt.m4])
 m4_include([src/m4/ax_check_compiler_flags.m4])
-m4_include([src/m4/ax_compiler_vendor.m4])
+#m4_include([src/m4/ax_compiler_vendor.m4])
 m4_include([src/m4/ax_gcc_archflag.m4])
 m4_include([src/m4/ax_gcc_x86_cpuid.m4])
