@@ -16,7 +16,7 @@
 
 
 # Initialise.
-AC_INIT([bgx], [1.1.2], [ernest.turro@ic.ac.uk])
+AC_INIT([bgx], [1.1.3], [ernest.turro@ic.ac.uk])
 AC_CONFIG_SRCDIR([src/bgx.cc])
 #AC_CONFIG_HEADERS([src/config.h])
 
@@ -29,18 +29,25 @@ fi
 CC=`"${R_HOME}/bin/R" CMD config CC`
 CXX=`"${R_HOME}/bin/R" CMD config CXX`
 
-# Set default flags
-#CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
-#CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
-#CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
+# Optimise code
+AX_COMPILER_VENDOR
+case "$ax_cv_c_compiler_vendor" in
+  gnu) # Reference flags
+    AX_CHECK_COMPILER_FLAGS([-ffast-math],[CFLAGS="$CFLAGS -ffast-math"])
+    AX_CHECK_COMPILER_FLAGS([-fomit-frame-pointer],[CFLAGS="$CFLAGS -fomit-frame-pointer"])
+    AX_CHECK_COMPILER_FLAGS([-O3],[CFLAGS="$CFLAGS -O3"])
+    AX_GCC_ARCHFLAG([no])
+    ;;
+  sun) # Rough equivalents from http://www.redhat.com/docs/wp/solaris_port/x99.html
+    AX_CHECK_COMPILER_FLAGS([-fast],[CFLAGS="$CFLAGS -fast"])
+    AX_CHECK_COMPILER_FLAGS([-xtarget=native],[CFLAGS="$CFLAGS -xtarget=native"])
+    ;;
+  intel) # Rough equivalents from ftp://download.intel.com/support/performancetools/c/linux/v9/copts_cls.pdf
+    AX_CHECK_COMPILER_FLAGS([-O3],[CFLAGS="$CFLAGS -O3"])
+    AX_CHECK_COMPILER_FLAGS([-xKWNBPT],[CFLAGS="$CFLAGS -xKWNBPT"])
+    ;;
+esac
 
-# Add optimisation flags.
-#AX_CC_MAXOPT
-# Catering for gnu only
-AX_CHECK_COMPILER_FLAGS(-ffast-math,CFLAGS="$CFLAGS -ffast-math")
-AX_CHECK_COMPILER_FLAGS(-fomit-frame-pointer,CFLAGS="$CFLAGS -fomit-frame-pointer")
-AX_CHECK_COMPILER_FLAGS(-O3,CFLAGS="$CFLAGS -O3")
-AX_GCC_ARCHFLAG([no])
 BGX_CFLAGS=$CFLAGS
 BGX_CXXFLAGS=$CFLAGS
 
@@ -74,3 +81,4 @@ AC_SUBST(BGX_CFLAGS)
 AC_SUBST(LIBS)
 AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
+
