@@ -818,7 +818,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     phi_.close();
     for(int i=0; i < *samples; i++) lambda_[i].close();
     eta_.close();
-    unkcats_.close();
+    if(*numberOfUnknownProbeSeqs) unkcats_.close();
   }
   
   if(*output >= ALL) {
@@ -869,14 +869,14 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   // IACT and MCSE
   ofstream mcse_((run_dir + "/MCSE").c_str());
   ofstream iact_((run_dir + "/IACT").c_str());
+  double * mcse = new double[*genes * *iter/(*subsample)];
   for(int c=0; c < *conditions; c++) {
-    double * mcse = new double[*genes * *iter/(*subsample)];
-
     mu_[c].seekg(0, ios::beg);
     
     for(int i=0; i < *iter/(*subsample); i++) {
       for(int g=0; g < *genes; g++) mu_[c] >> mcse[g**iter/(*subsample) + i];
     }
+
     for(int g=0; g < *genes; g++) {
       double var=0;
       double tau=0;
@@ -889,13 +889,13 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
         iact_ << tau << " ";
       }
     }
-    delete [] mcse;
     mcse_ << endl;
     iact_ << endl;
   }
   mcse_.close();
   iact_.close();
   for(int c=0; c<*conditions; ++c) mu_[c].close();
+  delete [] mcse;
 
   // In the parallel version, memory that is allocated by all nodes is deallocated here rather than above.
   // We do the same here for code structure compatibility.
