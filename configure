@@ -4679,8 +4679,14 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 		if test "$succeeded" != "yes" ; then
 			if test "$_version" = "0" ; then
-				{ { echo "$as_me:$LINENO: error: We could not detect the boost libraries (version $boost_lib_version_req_shorten or higher). If you have a staged boost library (still not installed) please specify \$BOOST_ROOT in your environment and do not give a PATH to --with-boost option.  If you are sure you have boost installed, then check your version number looking in <boost/version.hpp>. See http://randspringer.de/boost for more documentation." >&5
-echo "$as_me: error: We could not detect the boost libraries (version $boost_lib_version_req_shorten or higher). If you have a staged boost library (still not installed) please specify \$BOOST_ROOT in your environment and do not give a PATH to --with-boost option.  If you are sure you have boost installed, then check your version number looking in <boost/version.hpp>. See http://randspringer.de/boost for more documentation." >&2;}
+				{ { echo "$as_me:$LINENO: error: We could not detect the boost libraries (version $boost_lib_version_req_shorten or higher). If you have a staged boost library (still not installed) please specify \$BOOST_ROOT in your environment and do not give a PATH to --with-boost option.  If you are sure you have boost installed, then check your version number looking in <boost/version.hpp>. See http://randspringer.de/boost for more documentation. To install the boost libraries, visit http://boost.org or:
+        - Debian/Ubuntu users: \`sudo apt-get install libboost-dev\`.
+        - Fedora users: \`sudo yum install boost-devel\`.
+        - Mac OS X users: install Macports from macports.org and \`sudo port install boost\`." >&5
+echo "$as_me: error: We could not detect the boost libraries (version $boost_lib_version_req_shorten or higher). If you have a staged boost library (still not installed) please specify \$BOOST_ROOT in your environment and do not give a PATH to --with-boost option.  If you are sure you have boost installed, then check your version number looking in <boost/version.hpp>. See http://randspringer.de/boost for more documentation. To install the boost libraries, visit http://boost.org or:
+        - Debian/Ubuntu users: \`sudo apt-get install libboost-dev\`.
+        - Fedora users: \`sudo yum install boost-devel\`.
+        - Mac OS X users: install Macports from macports.org and \`sudo port install boost\`." >&2;}
    { (exit 1); exit 1; }; }
 			else
 				{ { echo "$as_me:$LINENO: error: 'Your boost libraries seems to old (version $_version).  We need at least $boost_lib_version_shorten'" >&5
