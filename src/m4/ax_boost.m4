@@ -1,6 +1,7 @@
 #####
-# Made tiny modifications so that we look for boost in /opt/local too 
-# (e.g. for Macports)
+# Made modifications so that we 
+# - look for boost in /opt/local too (e.g. for Macports).
+# - give boost installation tips for various *nix falvours in error message.
 #
 # Ernest Turro <ernest.turro@ic.ac.uk> April 2007
 #####
@@ -218,7 +219,10 @@ AC_DEFUN([AX_BOOST],
 
 		if test "$succeeded" != "yes" ; then
 			if test "$_version" = "0" ; then
-				AC_MSG_ERROR([[We could not detect the boost libraries (version $boost_lib_version_req_shorten or higher). If you have a staged boost library (still not installed) please specify \$BOOST_ROOT in your environment and do not give a PATH to --with-boost option.  If you are sure you have boost installed, then check your version number looking in <boost/version.hpp>. See http://randspringer.de/boost for more documentation.]])
+				AC_MSG_ERROR([[We could not detect the boost libraries (version $boost_lib_version_req_shorten or higher). If you have a staged boost library (still not installed) please specify \$BOOST_ROOT in your environment and do not give a PATH to --with-boost option.  If you are sure you have boost installed, then check your version number looking in <boost/version.hpp>. See http://randspringer.de/boost for more documentation. To install the boost libraries, visit http://boost.org or:
+        - Debian/Ubuntu users: `sudo apt-get install libboost-dev`.
+        - Fedora users: `sudo yum install boost-devel`.
+        - Mac OS X users: install Macports from macports.org and `sudo port install boost`.]])
 			else
 				AC_MSG_ERROR('Your boost libraries seems to old (version $_version).  We need at least $boost_lib_version_shorten')
 			fi
