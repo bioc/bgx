@@ -62,7 +62,7 @@ As an example, let us analyse the \Robject{Dilution} data set and save the resul
 library(affydata)
 library(hgu95av2cdf)
 data(Dilution)
-eset <- bgx(Dilution, samplesets=c(2,2), probeAff=F, burnin=2048, iter=8192,genes=c(12500:12599), output="all", basepath=".")
+eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,genes=c(12500:12599), output="all", basepath=".")
 @
 
 The \Robject{eset} object will contain gene expression information for each gene under each condition (not necessarily each array). You may obtain the gene expression measure using the \Rfunction{exprs} function. For instance:
