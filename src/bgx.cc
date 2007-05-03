@@ -82,9 +82,9 @@ void stringcpy(char* p, const string& s) {
 
 
 // The following are global so that we can delete them in a separate function if there is a user interrupt in R
-static double *xave=0, *yave=0, *muave, *sacc=0, *hacc=0, *muacc=0, *sigmaacc=0, *lambdaacc=0, *etaacc=0;
-static ofstream *sigma_=0, *lambda_=0, *XS=0, *YS=0;
-static fstream *mu_=0;
+static double *xave, *yave, *muave, *sacc, *hacc, *muacc, *sigmaacc, *lambdaacc, *etaacc;
+static ofstream *sigma_, *lambda_, *XS, *YS;
+static fstream *mu_;
   // Metropolis/Gibbs objects
 static  S_T *AccS;
 static  RWM<S_T,array2d> *S;
