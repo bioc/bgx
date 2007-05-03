@@ -325,5 +325,6 @@ int main(int argc, const char* argv[])
   delete[] categories;
   delete[] unknownProbeSeqs;
   delete[] dirname;
+  delete[] basepath;
   return 0;
 }
