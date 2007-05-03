@@ -16,7 +16,7 @@
 
 
 # Initialise.
-AC_INIT([bgx], [1.0.8], [ernest.turro@ic.ac.uk])
+AC_INIT([bgx], [1.0.9], [ernest.turro@ic.ac.uk])
 AC_CONFIG_SRCDIR([src/bgx.cc])
 #AC_CONFIG_HEADERS([src/config.h])
 
