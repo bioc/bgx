@@ -903,9 +903,20 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 #ifndef USING_R
   freeBGXMemory(output, numberGenesToWatch);
 #endif
+
+#ifndef USING_R
+  printf("Leaving bgx()...\n");
+#else
+  Rprintf((char *)"Leaving bgx()...\n");
+#endif
 }
 
 void freeBGXMemory(int *output, int *numberGenesToWatch) {
+#ifndef USING_R
+  printf("Deallocating memory...\n");
+#else
+  Rprintf((char *)"Deallocating memory...\n");
+#endif
   delete [] mu_;
   delete [] muave;
   delete AccS;
