@@ -64,8 +64,8 @@ G.O. Roberts and J.S. Rosenthal (September, 2006) Examples of Adaptive MCMC.}
 \examples{
   if(require(affydata) && require(hgu95av2cdf)) {
     data(Dilution)
-    eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,
-      genes=c(12500:12599), output="all", basepath=".")
+    eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=1024, iter=1024,
+      genes=c(12500:12549), output="all")
   }
 }
 \keyword{manip}% at least one, from doc/KEYWORDS
