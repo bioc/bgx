@@ -33,8 +33,8 @@ CXX=`"${R_HOME}/bin/R" CMD config CXX`
 AX_COMPILER_VENDOR
 case "$ax_cv_c_compiler_vendor" in
   gnu) # Reference flags
-    AX_CHECK_COMPILER_FLAGS([-ffast-math],[CFLAGS="$CFLAGS -ffast-math"])
-    AX_CHECK_COMPILER_FLAGS([-fomit-frame-pointer],[CFLAGS="$CFLAGS -fomit-frame-pointer"])
+   # Does -ffast-math cause segfault on some systems?
+   # AX_CHECK_COMPILER_FLAGS([-ffast-math],[CFLAGS="$CFLAGS -ffast-math"])
     AX_CHECK_COMPILER_FLAGS([-O3],[CFLAGS="$CFLAGS -O3"])
     AX_GCC_ARCHFLAG([no])
     ;;
