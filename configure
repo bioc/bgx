@@ -2679,6 +2679,7 @@ fi
 { echo "$as_me:$LINENO: result: $ax_cv_c_compiler_vendor" >&5
 echo "${ECHO_T}$ax_cv_c_compiler_vendor" >&6; }
 
+OPTFLAGS="" # optimisation flags
 case "$ax_cv_c_compiler_vendor" in
   gnu) # Reference flags
      { echo "$as_me:$LINENO: checking whether C compiler accepts -ffast-math" >&5
@@ -2737,7 +2738,7 @@ eval ax_check_compiler_flags=$ax_cv_c_flags__ffast_math
 { echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
 echo "${ECHO_T}$ax_check_compiler_flags" >&6; }
 if test "x$ax_check_compiler_flags" = xyes; then
-	CFLAGS="$CFLAGS -ffast-math"
+	OPTFLAGS="$OPTFLAGS -ffast-math"
 else
 	:
 fi
@@ -2798,7 +2799,7 @@ eval ax_check_compiler_flags=$ax_cv_c_flags__O3
 { echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
 echo "${ECHO_T}$ax_check_compiler_flags" >&6; }
 if test "x$ax_check_compiler_flags" = xyes; then
-	CFLAGS="$CFLAGS -O3"
+	OPTFLAGS="$OPTFLAGS -O3"
 else
 	:
 fi
@@ -3477,7 +3478,7 @@ eval ax_check_compiler_flags=$ax_cv_c_flags__fast
 { echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
 echo "${ECHO_T}$ax_check_compiler_flags" >&6; }
 if test "x$ax_check_compiler_flags" = xyes; then
-	CFLAGS="$CFLAGS -fast"
+	OPTFLAGS="$OPTFLAGS -fast"
 else
 	:
 fi
@@ -3538,7 +3539,7 @@ eval ax_check_compiler_flags=$ax_cv_c_flags__xtarget_native
 { echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
 echo "${ECHO_T}$ax_check_compiler_flags" >&6; }
 if test "x$ax_check_compiler_flags" = xyes; then
-	CFLAGS="$CFLAGS -xtarget=native"
+	OPTFLAGS="$OPTFLAGS -xtarget=native"
 else
 	:
 fi
@@ -3601,7 +3602,7 @@ eval ax_check_compiler_flags=$ax_cv_c_flags__O3
 { echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
 echo "${ECHO_T}$ax_check_compiler_flags" >&6; }
 if test "x$ax_check_compiler_flags" = xyes; then
-	CFLAGS="$CFLAGS -O3"
+	OPTFLAGS="$OPTFLAGS -O3"
 else
 	:
 fi
@@ -3662,7 +3663,7 @@ eval ax_check_compiler_flags=$ax_cv_c_flags__xKWNBPT
 { echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
 echo "${ECHO_T}$ax_check_compiler_flags" >&6; }
 if test "x$ax_check_compiler_flags" = xyes; then
-	CFLAGS="$CFLAGS -xKWNBPT"
+	OPTFLAGS="$OPTFLAGS -xKWNBPT"
 else
 	:
 fi
@@ -3670,8 +3671,8 @@ fi
     ;;
 esac
 
-BGX_CFLAGS=$CFLAGS
-BGX_CXXFLAGS=$CFLAGS
+BGX_CFLAGS="$CFLAGS $OPTFLAGS"
+BGX_CXXFLAGS="$CXXFLAGS $OPTFLAGS"
 
 # We are compiling for R.
 BGX_CXXFLAGS="$BGX_CXXFLAGS -DUSING_R"

@@ -31,24 +31,25 @@ CXX=`"${R_HOME}/bin/R" CMD config CXX`
 
 # Optimise code
 AX_COMPILER_VENDOR
+OPTFLAGS="" # optimisation flags
 case "$ax_cv_c_compiler_vendor" in
   gnu) # Reference flags
-    AX_CHECK_COMPILER_FLAGS([-ffast-math],[CFLAGS="$CFLAGS -ffast-math"])
-    AX_CHECK_COMPILER_FLAGS([-O3],[CFLAGS="$CFLAGS -O3"])
+    AX_CHECK_COMPILER_FLAGS([-ffast-math],[OPTFLAGS="$OPTFLAGS -ffast-math"])
+    AX_CHECK_COMPILER_FLAGS([-O3],[OPTFLAGS="$OPTFLAGS -O3"])
     AX_GCC_ARCHFLAG([no])
     ;;
   sun) # Rough equivalents from http://www.redhat.com/docs/wp/solaris_port/x99.html
-    AX_CHECK_COMPILER_FLAGS([-fast],[CFLAGS="$CFLAGS -fast"])
-    AX_CHECK_COMPILER_FLAGS([-xtarget=native],[CFLAGS="$CFLAGS -xtarget=native"])
+    AX_CHECK_COMPILER_FLAGS([-fast],[OPTFLAGS="$OPTFLAGS -fast"])
+    AX_CHECK_COMPILER_FLAGS([-xtarget=native],[OPTFLAGS="$OPTFLAGS -xtarget=native"])
     ;;
   intel) # Rough equivalents from ftp://download.intel.com/support/performancetools/c/linux/v9/copts_cls.pdf
-    AX_CHECK_COMPILER_FLAGS([-O3],[CFLAGS="$CFLAGS -O3"])
-    AX_CHECK_COMPILER_FLAGS([-xKWNBPT],[CFLAGS="$CFLAGS -xKWNBPT"])
+    AX_CHECK_COMPILER_FLAGS([-O3],[OPTFLAGS="$OPTFLAGS -O3"])
+    AX_CHECK_COMPILER_FLAGS([-xKWNBPT],[OPTFLAGS="$OPTFLAGS -xKWNBPT"])
     ;;
 esac
 
-BGX_CFLAGS=$CFLAGS
-BGX_CXXFLAGS=$CFLAGS
+BGX_CFLAGS="$CFLAGS $OPTFLAGS"
+BGX_CXXFLAGS="$CXXFLAGS $OPTFLAGS"
 
 # We are compiling for R.
 BGX_CXXFLAGS="$BGX_CXXFLAGS -DUSING_R"
