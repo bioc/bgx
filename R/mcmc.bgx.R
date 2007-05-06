@@ -65,7 +65,7 @@ function(pm,mm,samplesets,probesets,numberCategories,categories,unknownProbeSeqs
         as.double(optimalAR),#optimal acceptance ratio
         as.integer(subsample),#subsampling interval
         as.integer(out.ind),#indicator of what output we want
-        as.character("gobbledigook"), # dirname returned in here
+        as.character(paste(character(length=length(basepath)+16), collapse="x")), # output path returned in here
         as.character(basepath),# base path in which to put run directories 
         as.integer(seed),#seed
         as.character(samplenames), # chip names 
