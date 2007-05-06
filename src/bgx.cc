@@ -187,10 +187,12 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   Random rand(*seed);
 
   // Create output file and directory
-  char tmpstr[80];
+  char tmpstr[strlen(*basepath)+4];
   strcpy(tmpstr, *basepath); // Prepend basepath
   strcat(tmpstr,"/run");
   run_dir = rundir(tmpstr);
+  // In R, dirname is set to the ouput directory
+  stringcpy(*dirname,run_dir);
 
   // Copy affinity plot file to run_dir if available
   if(affinityPlotFile!=NULL) {
@@ -239,9 +241,6 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     for(int s =0; s < *samples-1; s++) summary << sampleNames[s] << ", ";
     summary << sampleNames[*samples-1] << endl;
 
-  // In R, dirname is set to the ouput directory
-  stringcpy(*dirname,run_dir);
-  
   // Open outoput files
   filename=run_dir+"/muave";
   muave_.open(filename.c_str());
