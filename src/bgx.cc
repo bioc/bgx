@@ -187,10 +187,11 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   Random rand(*seed);
 
   // Create output file and directory
-  char tmpstr[strlen(*basepath)+4];
+  char *tmpstr = new char[strlen(*basepath)+4];
   strcpy(tmpstr, *basepath); // Prepend basepath
   strcat(tmpstr,"/run");
   run_dir = rundir(tmpstr);
+  delete [] tmpstr;
   // In R, dirname is set to the ouput directory
   stringcpy(*dirname,run_dir);
 
