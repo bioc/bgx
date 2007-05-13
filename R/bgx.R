@@ -20,6 +20,8 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
 #  if(burnin %% 1024 != 0 || iter %% 1024 != 0)
 #    stop("\"iter\" and \"burnin\" must be a multiple of 1024")
   # create directory where runs will be saved if necessary
+  basepath <- gsub("\\\\","/",basepath)
+  cat("basepath: ", basepath,"\n")
   if(!file.exists(basepath)) dir.create(basepath)
 
   # do not analyse the same gene more than once, even if specified in the arguments
