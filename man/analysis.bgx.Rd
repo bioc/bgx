@@ -13,7 +13,7 @@
 \usage{
   plotExpressionDensity(bgxOutput, gene=NULL, normalize=c("none","mean","loess"),...)
   plotDEDensity(bgxOutput, gene=NULL, conditions=c(1,2), normalize=c("none","mean","loess"), ...)
-  plotDEHistogram(bgxOutput, conditions=c(1,2), normalize=c("none","mean","loess"), df=7)
+  plotDEHistogram(bgxOutput, conditions=c(1,2), normalize=c("none","mean","loess"), df=floor(1.8 * log10(length(bgxOutput[["geneNames"]]))))
   plotDERank(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"))
   plotDiffRank(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"),ymax=NULL)
 }

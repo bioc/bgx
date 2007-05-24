@@ -137,7 +137,7 @@ plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean"
 }
 
 ### Estimate proportion of DE genes. Method similar to Efron
-plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), df=floor(1.8*log10(length(bgxOutput$geneNames)))) {
+plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), df=floor(1.8*log10(length(bgxOutput[["geneNames"]])))) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
   else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1])
