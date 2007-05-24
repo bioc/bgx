@@ -62,10 +62,11 @@ G.O. Roberts and J.S. Rosenthal (September, 2006) Examples of Adaptive MCMC.}
 \note{The bgx() method and the bgx standalone binary create a directory in the working directory called 'run.x' (x:1,2,3,...), wherein files are placed for further detailed analysis.
 }
 \examples{
+  # This example requires the 'affydata' and 'hgu95av2cdf' packages 
   if(require(affydata) && require(hgu95av2cdf)) {
     data(Dilution)
-    eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=1024, iter=1024,
-      genes=c(12500:12549), output="all")
+    eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=4096, iter=8192,
+      genes=c(12500:12599), output="all")
   }
 }
 \keyword{manip}% at least one, from doc/KEYWORDS

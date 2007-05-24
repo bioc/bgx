@@ -26,6 +26,10 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   # do not analyse the same gene more than once, even if specified in the arguments
   genes <- unique(genes); genesToWatch <- unique(genesToWatch)
 
+  # make sure there isn't a gene buffer overlow
+  if(any(genes > length(geneNames(aData)))) 
+    stop("Sorry, you have specified genes which do not exist on this AffyBatch object.")
+
   output <- match.arg(output)
 
   # not being able to pass by reference sucks.  
@@ -64,7 +68,7 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   if(probeAff) saveAffinityPlot.bgx(originalAffinities, categories, outdir, probecat_threshold)
   write(geneNames(aData)[genes], file=file.path(outdir,"geneNames.txt"))
   
-  cat("\nFiles in '",outdir,"'\n")
+  cat("\nFiles in '",outdir,"'\n",sep="")
   cat("Run(s) finished.\n")
 
   # this should be an argument

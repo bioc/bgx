@@ -137,7 +137,7 @@ plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean"
 }
 
 ### Estimate proportion of DE genes. Method similar to Efron
-plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), df=7) {
+plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), df=floor(1.8*log10(length(bgxOutput$geneNames)))) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
   else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1])
@@ -146,39 +146,13 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
   pp <- c()
   for(i in 1:length(bgxOutput$geneNames)) pp[i] <- mean(diff[i,] < 0)
 
-  bre = seq(0,1,by=0.025)
-#  df = 7
-  pct = 0
-  pct0 = 2/3
-  nulltype = 1
-  type = 1
+  if(length(pp) < 100) stop("Sorry, your sample of genes is too small. This method only works well with 100 or more genes.\n")
 
-  require("splines")
+  cat("Degrees of freedom: ",df, "(decrease for smoother curve).\n")
 
-  if(length(bre) > 1) {
-    lo <- min(bre)
-    up <- max(bre)
-    bre <- length(bre)
-  }
-  else {
-    if(length(pct) > 1) {
-      lo <- pct[1]
-      up <- pct[2]
-    }
-    else {
-      if(pct == 0) {
-        lo <- min(pp)
-        up <- max(pp)
-      }
-      else {
-        v <- quantile(pp, c(pct, 1 - pct))
-        lo <- v[1]
-        up <- v[2]
-      }
-    }
-  }
-  ppp <- pmax(pmin(pp, up), lo)
-  breaks <- seq(lo, up, length = bre)
+#  require("splines")
+  ppp <- pmax(pmin(pp, 1), 0)
+  breaks <- seq(0, 1, by=1/ifelse(length(pp)<1000,20,40))
   ph <- hist(ppp, breaks = breaks, plot = FALSE)
 
   # fitting curve 'f' to histogram:
@@ -186,25 +160,8 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
   x <- (breaks[-1] + breaks[ - length(breaks)])/2
   y <- ph$counts
   N <- length(y)
-  if(pct > 0) {
-    y[1.] <- min(y[1.], 1.)
-    y[N] <- min(y[N], 1.)
-  }
-  if(type == 0) {
-    f <- glm(y ~ ns(x, df = df), poisson)$fit
-  } 
-  else {
-    f <- glm(y ~ poly(x, df = df), poisson)$fit
-  }
+  f <- glm(y ~ poly(x, df = df), poisson)$fit
 
-#  cat("The histogram:\n")
-#  cat("x: ")
-#  cat(x,"\n")
-#  cat("y: ")
-#  cat(y,"\n")
-#  cat("The curve fitted to the full histogram using poisson regression, f:\n")
-#  cat(round(f),"\n")
-  
   # identifying local maxima and minima on curve 'f': 
 
   help=sign(f[1:(length(f)-1)]-f[2:(length(f))])
@@ -217,11 +174,10 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
   localMinima = 0
   numberLocalMinima = 0
 
-  if( help[1] > 0.0 ){
+  if( help[1] > 0.0 ) {
     numberLocalMaxima = numberLocalMaxima+1
     localMaxima[numberLocalMaxima] = 1
-  }
-  else{
+  } else {
     numberLocalMinima = numberLocalMinima+1
     localMinima[numberLocalMinima] = 1
   }
@@ -230,8 +186,7 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
        if( sign(help[i]) < 0.0 ){
          numberLocalMaxima = numberLocalMaxima+1
          localMaxima[numberLocalMaxima] = i+1
-       }
-       else{
+       } else{
          numberLocalMinima = numberLocalMinima+1
          localMinima[numberLocalMinima] = i+1
        }
@@ -243,28 +198,18 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
   if( sign(help[(length(f)-1)]) < 0.0 ){
     numberLocalMaxima = numberLocalMaxima+1
     localMaxima[numberLocalMaxima] = length(f)
-  }
-  else{
+  } else{
     numberLocalMinima = numberLocalMinima+1
     localMinima[numberLocalMinima] = length(f)
   }
 
   specialPoints=union(union(1,signChanges),length(f))
 
-#  cat("Number localMaxima: ",numberLocalMaxima,"\n")
-#  cat("localMaxima (red): x's:",x[localMaxima],"  y's:",f[localMaxima],"\n")
-#  cat("Number localMinima: ",numberLocalMinima,"\n")
-#  cat("localMinima (green): x's:",x[localMinima],"  y's:",f[localMinima],"\n")
-#  cat("When fitting f0 we give zero weight to the categories below/above (both incl) these\n")
-#  cat("two minimas: x:",x[localMinima[c(1,length(localMinima))]]," f:",f[localMinima[c(1,length(localMinima))]],"\n")
-#  cat("apart from the first and last categories which are given count 0 and weight 1\n")
   innermaxval=max(f[setdiff(localMaxima,c(1,40))])
   innermaxentry=localMaxima[f[localMaxima]==innermaxval]
  
   # fitting two curves to histogram: one to the left (f0left) and one to the right
   # (f0right) of the inner max. These curves make up the null.
-
-  df0=df
 
   # fitting the curve left of innermax:
   #   - first fixing count y[1] to zero and giving it weight 1:
@@ -279,31 +224,10 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
     weights0[2:(localMinima[1])]=0
   }
 
- # cat("initial weights of categories for f0 fit:\n")
- # cat(weights0[1:innermaxentry],"\n")
+  # Abort if the innermaxentry is too near the edges
+  if(length(1:innermaxentry) < df || length(innermaxentry:length(y)) < df) stop("Sorry, differential expression appears to be systematically biased. Maybe you need to normalize (see help(\"plotDEHistogram\")) or maybe you are not using a representative subset of genes.\n")
 
-  # - testing whether histogram counts are decreasing for categories right of
-  #   'localMinima[1]' category. If they are the fit of f0 goes haywire. To avoid
-  #   this we further fix the weights of the categories with decreasing counts immediately
-  #   right of localMinima[1] to zero.
-
-#  k=localMinima[1]+1
-
- # while( k<(innermaxentry-1) & ph$counts[k]>ph$counts[k+1]){
- #   weights0[k]=0
- #   k=k+1
- # }
-
-#  cat("final weights of categories for f0 fit (after possibly setting weights of\n")
-#  cat("additional categories to zero, in order to obtain required histogram shape for f0):\n")
-#  cat(weights0[1:innermaxentry],"\n")
-
-  if(type == 0) {
-    f0left <- glm(y[1:innermaxentry] ~ ns(x[1:innermaxentry], df = df0),weights=weights0[1:innermaxentry], poisson)$fit
-  } 
-  else {
-    f0left <- glm(y[1:innermaxentry] ~ poly(x[1:innermaxentry], df = df0),weights=weights0[1:innermaxentry], poisson)$fit
-  }   
+  f0left <- glm(y[1:innermaxentry] ~ poly(x[1:innermaxentry], df = df),weights=weights0[1:innermaxentry], poisson)$fit
 
   NumberNullGenesf0left=round(sum(f0left),0)
 
@@ -320,24 +244,7 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
     weights0[localMinima[length(localMinima)]:(length(y)-1)]=0 
   }
 
-  # testing whether histogram counts are decreasing for categories left of
-  # 'localMinima[length(localMinima)]' category. If they are, the fit of f0 goes haywire. 
-  # To avoid this we further fix the weights of the categories with decreasing counts immediately
-  # left of localMinima[length(localMinima)] to zero.
-
-#  k=localMinima[length(localMinima)]-1
-
-#  while( k>(innermaxentry+1) & ph$counts[k-1]<ph$counts[k]){
-#    weights0[k]=0
-#    k=k+1
-#  }
-
-  if(type == 0) {
-    f0right <- glm(y[innermaxentry:length(y)] ~ ns(x[innermaxentry:length(y)], df = df0),weights=weights0[innermaxentry:length(y)], poisson)$fit
-  } 
-  else {
-    f0right <- glm(y[innermaxentry:length(y)] ~ poly(x[innermaxentry:length(y)], df = df0),weights=weights0[innermaxentry:length(y)], poisson)$fit
-  }   
+  f0right <- glm(y[innermaxentry:length(y)] ~ poly(x[innermaxentry:length(y)], df = df),weights=weights0[innermaxentry:length(y)], poisson)$fit
   
   NumberNullGenesf0right=round(sum(f0right[2:length(f0right)]),0)
  
@@ -345,31 +252,21 @@ plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "m
 
   # taking care of roundings:
 
-#  cat("the f0left curve:\n")
-#  cat(round(f0left),"\n")
-#  cat("the f0right curve:\n")
-#  cat(round(f0right),"\n")
-
   NumberDiffGenesLeft=max(sum(ph$counts[1:innermaxentry])-NumberNullGenesf0left,0)
   NumberDiffGenesRight=max(sum(ph$counts[(innermaxentry+1):length(ph$counts)])-NumberNullGenesf0right,0)
   NumberDiffGenes=NumberDiffGenesLeft+NumberDiffGenesRight
 
-  cat("number diff genes left: ",NumberDiffGenesLeft,"\n")
-  cat("number diff genes right: ",NumberDiffGenesRight,"\n")
-  cat("numberDiff genes: ",NumberDiffGenes,"\n")
+  cat("Number of differentially expressed  genes (left): ",NumberDiffGenesLeft,"\n")
+  cat("Number of differentially expressed  genes (right): ",NumberDiffGenesRight,"\n")
+  cat("Total number of differentially expressed genes: ",NumberDiffGenes,"\n")
   
   # plotting the histogram, fitted curve and intersting points:
 
-  plot(ph,main=substitute(paste("Histogram of P(",mu[two] - mu[one]," < 0)"),list(two=paste("g",conditions[2],sep=""),one=paste("g",conditions[1],sep=""))) ,xlab=paste("#DEG:",NumberDiffGenes," up:",NumberDiffGenesLeft," down:",NumberDiffGenesRight,sep=""),cex.main=1.6,cex.lab=1.5,cex.axis=1.4)
+  plot(ph,main=substitute(paste("Histogram of P(",mu[two] - mu[one]," < 0); df=",df),list(two=paste("g",conditions[2],sep=""),one=paste("g",conditions[1],sep=""),df=df)) ,xlab=paste("#DEG:",NumberDiffGenes," up:",NumberDiffGenesLeft," down:",NumberDiffGenesRight,sep=""),cex.main=1.6,cex.lab=1.5,cex.axis=1.4)
   lines(x,f,col=8,lwd=2)
   points(x[localMaxima],f[localMaxima],col=2,pch=1,cex=2)  # maxima: red circle
   points(x[localMinima],f[localMinima],col=4,pch=2,cex=2)  # minima: blue
   points(x[innermaxentry],f[innermaxentry],col=1,pch=20,cex=2)
-  # points(x[localMinima[c(1,length(localMinima))]],f[localMinima[c(1,length(localMinima))]],col=1,pch=20,cex=2)
-  # points(x[innermaxentry],f[innermaxentry],col=1,pch=5,cex=2)
-  #points(x[localMinima[c(1,length(localMinima))]],f[localMinima[c(1,length(localMinima))]],col=4,pch=5,cex=2)
-  #points(x[postonegreflpoints],f[postonegreflpoints],col=1,pch=20,cex=2)
-  #points(x[negtoposreflpoints],f[negtoposreflpoints],col=1,pch=20,cex=2)
   lines(x[1:innermaxentry],f0left,col=1,lwd=2)
   lines(x[innermaxentry:length(y)],f0right,col=1,lwd=2)
 
