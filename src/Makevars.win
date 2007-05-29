@@ -1,10 +1,11 @@
 # This is for gcc+win32 users (http://mingw.org)
 # You may need to change the path to the boost libraries (http://boost.org)
 
+# BOOSTLIB=c:/boost_1_34_0
+
 MACHINE = -march=i386
 PKG_CXXFLAGS= -DUSING_R $(MACHINE) -ffast-math -O3
 PKG_CFLAGS = $(PKG_CXXFLAGS)  -std=c99
-#PKG_CPPFLAGS = -Ic:/Boost
 ifdef BOOSTLIB
   PKG_CPPFLAGS = -I $(BOOSTLIB)
 endif

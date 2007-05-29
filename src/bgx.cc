@@ -26,10 +26,16 @@
   #include <R.h> // for flushing console
   #include <R_ext/Utils.h> // we need to allow user interrupts from R
   #include <R_ext/Print.h> // R for windows doesn't like cout or printf, need Rprintf
-  #if ( defined(HAVE_AQUA) || defined(Win32) )
+  #if ( defined(HAVE_AQUA) || defined(WIN32) )
     #define FLUSHCONSOLE {R_FlushConsole(); R_ProcessEvents();}
   #else
     #define FLUSHCONSOLE R_FlushConsole();
+  #endif
+   #ifdef WIN32
+    // Win32 GUI doesn't handle \r properly. Use \b's.
+    #define CLEARLINE "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  #else
+    #define CLEARLINE "\r"
   #endif
   }
 #endif
@@ -226,7 +232,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     << "Number of genes to monitor fully:\t" << *numberGenesToWatch << endl
 	  << "Subsampling interval:\t" << *subsample << endl
 	  << "Number of burn-in sweeps:\t" << *burnin << endl
-	  << "Number of post burn-in sweeps:\t" << *iter << endl
+	  << "Number of sampling sweeps:\t" << *iter << endl
 	  << "Spread of jumps in S:\t" << *s_jmp << endl
 	  << "Spread of jumps in H:\t" << *h_jmp << endl
 	  << "Spread of jumps in mu:\t" << *mu_jmp << endl
@@ -593,7 +599,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     printf("Burn-in sweep %d of %d\r", sweep , *burnin);
     if(sweep%16 == 0) fflush(stdout);
 #else
-    Rprintf((char *)"Burn-in sweep %d of %d\r", sweep , *burnin);
+    Rprintf((char *)"%sBurn-in sweep %d of %d", CLEARLINE, sweep , *burnin);
     if(sweep%16 == 0) FLUSHCONSOLE
     R_CheckUserInterrupt();
 #endif
@@ -635,9 +641,9 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     
   }
 #ifndef USING_R
-  printf("%d burnin sweeps completed.\n", *burnin);
+  printf("%d burn-in sweeps completed.\n", *burnin);
 #else
-  Rprintf((char *)"%d burnin sweeps completed.\n", *burnin);
+  Rprintf((char *)"%s%d burn-in sweeps completed.\n", CLEARLINE, *burnin);
 #endif
 
   S->Reset();
@@ -653,10 +659,10 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   // Run the Markov chain: Sampling phase
   for(int sweep=0; sweep<*iter; ++sweep){
 #ifndef USING_R
-    printf("Post burn-in sweep %d of %d\r", sweep, *iter);
+    printf("Sampling sweep %d of %d\r", sweep, *iter);
     if(sweep%16 == 0) fflush(stdout);
 #else
-    Rprintf((char *)"Post burn-in sweep %d of %d\r", sweep, *iter);
+    Rprintf((char *)"%sSampling sweep %d of %d", CLEARLINE, sweep, *iter);
     if(sweep%16 == 0) FLUSHCONSOLE
     R_CheckUserInterrupt();
 #endif
@@ -687,7 +693,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     Phi->Update();
 
 
-    // Not adapting jumps in post burn-in phase
+    // Not adapting jumps in sampling phase
 /*    if(*adaptive && (sweep+1)%*batch_size==0){
       S->Update_jmps();
       H->Update_jmps();
@@ -775,10 +781,10 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   int duration = (int)difftime(end_time,start_time);
 
 #ifndef USING_R
-  printf("%d post burn-in sweeps completed.\n", *iter);
+  printf("%d sampling sweeps completed.\n", *iter);
   printf("MCMC duration: %dh %dm %ds\n", duration/3600, duration%3600/60, duration%60);
 #else
-  Rprintf((char *)"%d post burn-in sweeps completed.\n", *iter);
+  Rprintf((char *)"%s%d sampling sweeps completed.\n", CLEARLINE, *iter);
   Rprintf((char *)"MCMC duration: %dh %dm %ds\n", duration/3600, duration%3600/60, duration%60);
 #endif
 
