@@ -28,10 +28,18 @@
   \item{...}{Parameters to pass to density function (where applicable).}
 }
 \details{
-  See \code{\link{bgx}} for more details.
+  \code{plotExpressionDensity} plots gene expression distributions under various conditions for the specified gene.
+
+  \code{plotDEDensity} plots the differential expression distribution between two conditions for a given gene.
+
+  \code{plotDEHistogram} plots a histogram of differential expression between two conditions and estimates the number of up and down regulated differentially expressed genes.
+
+  \code{plotDERank} plots (absolute) ranked differential expression values and returns them in a matrix.
+
+  \code{plotDiffRank} plots 2.5-97.5\% confidence intervals for ranked differential expression estimates.
 }
 \value{
-  None.
+  None, except \code{plotDERank}, which returns a matrix of genes ranked by differential expression.
 }
 \author{Ernest Turro}
 \seealso{\code{\link{bgx}}, \code{\link{standalone.bgx}}, \code{\link{readOutput.bgx}}, \code{\link{plotExpressionDensity}}, \code{\link{plotDEDensity}}, \code{\link{plotDEHistogram}}}
