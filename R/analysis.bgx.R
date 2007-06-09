@@ -93,7 +93,7 @@ plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("n
 
 }
 
-### Plot sorted DE of genes 
+### Plot sorted DE of genes and return this in a matrix 
 plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess")) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
@@ -106,8 +106,11 @@ plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", 
 
   plot(c(1:nrow(bgxOutput$mu[[1]])), de[order], cex=0.5, pch=19, xlab="rank", ylab="Differential expression", 
     main=paste("Sorted differential expression between cond", conditions[1], " and cond",conditions[2],"\nnormalisation: ",normalize))
+
+ return(matrix(c(order,de[order]), dimnames=list( c(bgxOutput$geneNames[order]), c("Position", "DiffExpression")), ncol=2))
 }
 
+### Plot sorted 2.5-97.5% CI of DE (not absolute value)
 plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), ymax=NULL) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])

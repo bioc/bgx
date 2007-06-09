@@ -109,7 +109,17 @@ You may then pass the \Robject{bgxOutput} object to any of several analysis func
 plotExpressionDensity(bgxOutput, gene=10)
 @
 
-Run \Rfunction{help(analysis.bgx)} for usage instructions.
+In order to view a plot of ranked differential expression values and save these in a matrix, you could do:
+
+<<fig=TRUE>>=
+rankedGeneList <- plotDERank(bgxOutput)
+@
+
+<<echo=T>>=
+print(rankedGeneList[1:25,])
+@
+
+Run \Rfunction{help(analysis.bgx)} for more detailed usage instructions on the analysis functions.
 
 <<echo=F>>=
 unlink("run.1", recursive=TRUE)
