@@ -16,12 +16,12 @@
 
 
 "bgx" <-
-function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536,output=c("minimal","trace","all"), probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, basepath=file.path(tempdir(),"bgx")) {
+function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536,output=c("minimal","trace","all"), probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, rundir=".") {
 #  if(burnin %% 1024 != 0 || iter %% 1024 != 0)
 #    stop("\"iter\" and \"burnin\" must be a multiple of 1024")
   # create directory where runs will be saved if necessary
-  if(.Platform$OS.type=="windows") basepath <- gsub("\\\\","/",basepath) # Use / as file separator
-  if(!file.exists(basepath)) dir.create(basepath)
+  if(.Platform$OS.type=="windows") rundir <- gsub("\\\\","/",rundir) # Use / as file separator
+  if(!file.exists(rundir)) dir.create(rundir)
 
   # do not analyse the same gene more than once, even if specified in the arguments
   genes <- unique(genes); genesToWatch <- unique(genesToWatch)
@@ -51,7 +51,7 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
 
   outdir=mcmc.bgx(pm,mm,samplesets,probesets,numberOfCategories, categories, unknownProbeSeqs, 
   numberOfUnknownProbeSeqs,
-  numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), basepath=basepath)
+  numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), rundir=rundir)
   cat("CEL files analysed: ")
   for(c in 1:numArrays) cat(sampleNames(aData)[c]," ")
   

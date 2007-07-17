@@ -23,7 +23,7 @@
 "mcmc.bgx" <-
 function(pm,mm,samplesets,probesets,numberCategories,categories,unknownProbeSeqs,numberOfUnknownProbeSeqs,
   numberGenesToWatch, whichGenesToWatch,whichProbesToWatch,iter,burnin,adaptive, batch_size=50, optimalAR=0.44,output,
-  samplenames="unknown", subsample=ifelse(iter>1024,iter/1024,1),seed=192492, basepath) {
+  samplenames="unknown", subsample=ifelse(iter>1024,iter/1024,1),seed=192492, rundir) {
 
   #make an indicator variable for what type of output we want
   if(output=="minimal") out.ind<-0
@@ -65,8 +65,8 @@ function(pm,mm,samplesets,probesets,numberCategories,categories,unknownProbeSeqs
         as.double(optimalAR),#optimal acceptance ratio
         as.integer(subsample),#subsampling interval
         as.integer(out.ind),#indicator of what output we want
-        as.character(paste(character(length=length(basepath)+16), collapse="x")), # output path returned in here
-        as.character(basepath),# base path in which to put run directories 
+        as.character(paste(character(length=length(rundir)+16), collapse="x")), # output path returned in here
+        as.character(rundir),# base path in which to put run directories 
         as.integer(seed),#seed
         as.character(samplenames), # chip names 
         as.character(NULL),# no need to copy affinity plot to output directory 

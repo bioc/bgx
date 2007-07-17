@@ -54,7 +54,7 @@ A basic execution of the program can be performed by simply passing an \Robject{
 > eset <- bgx(aData)
 \end{Sinput}
 
-A more elaborate scenario would involve splitting the arrays into a number of conditions using the \Rfunarg{samplesets} argument\footnote{Note that if your \Robject{AffyBatch} object contains information on the experimental design in the \Robject{phenoData} slot, you do not need to use the \Rfunarg{samplesets} argument.}; specifying which genes to analyse with the \Rfunarg{genes} argument; specifying whether to take into account probe affinity with \Rfunarg{probeAff}; setting the number of burn-in and post burn-in runs with the \Rfunarg{burnin} and \Rfunarg{iter} arguments respectively; and setting the set of parameters to save with the \Rfunarg{output} argument\footnote{\Rfunarg{output} can be set to either "minimal", "trace" or "all". See the documentation for an explanation of what these levels mean}. Execute \Rfunction{help(bgx)} in R for a full explanation of all the parameters. 
+A more elaborate scenario would involve splitting the arrays into a number of conditions using the \Rfunarg{samplesets} argument\footnote{Note that if your \Robject{AffyBatch} object contains information on the experimental design in the \Robject{phenoData} slot, you do not need to use the \Rfunarg{samplesets} argument.}; specifying which genes to analyse with the \Rfunarg{genes} argument; specifying whether to take into account probe affinity with \Rfunarg{probeAff}; setting the number of burn-in and post burn-in runs with the \Rfunarg{burnin} and \Rfunarg{iter} arguments respectively; setting the set of parameters to save with the \Rfunarg{output} argument\footnote{\Rfunarg{output} can be set to either "minimal", "trace" or "all". See the documentation for an explanation of what these levels mean}; and specifying where to save the runs with \Rfunarg{rundir}. Execute \Rfunction{help(bgx)} in R for a full explanation of all the parameters. 
 
 As an example, let us analyse the \Robject{Dilution} data set and save the results in the current working directory ("."):
 
@@ -62,7 +62,7 @@ As an example, let us analyse the \Robject{Dilution} data set and save the resul
 library(affydata)
 library(hgu95av2cdf)
 data(Dilution)
-eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,genes=c(12500:12599), output="all", basepath=".")
+eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,genes=c(12500:12599), output="all")
 @
 
 The \Robject{eset} object will contain gene expression information for each gene under each condition (not necessarily each array). You may obtain the gene expression measure using the \Rfunction{exprs} function. For instance:
