@@ -873,35 +873,35 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   }
 
   // IACT and MCSE
-  ofstream mcse_((run_dir + "/MCSE").c_str());
-  ofstream iact_((run_dir + "/IACT").c_str());
-  double * mcse = new double[*genes * *iter/(*subsample)];
+  ofstream mumcse_((run_dir + "/mumcse").c_str());
+  ofstream muiact_((run_dir + "/muiact").c_str());
+  double * mumcse = new double[*genes * *iter/(*subsample)];
   for(int c=0; c < *conditions; c++) {
     mu_[c].seekg(0, ios::beg);
     
     for(int i=0; i < *iter/(*subsample); i++) {
-      for(int g=0; g < *genes; g++) mu_[c] >> mcse[g**iter/(*subsample) + i];
+      for(int g=0; g < *genes; g++) mu_[c] >> mumcse[g**iter/(*subsample) + i];
     }
 
     for(int g=0; g < *genes; g++) {
       double var=0;
       double tau=0;
       int m=0;
-      if(sokal(*iter/(*subsample),&mcse[g**iter/(*subsample)],&var,&tau,&m)!=0) {
-        mcse_ << *iter/(*subsample) << " ";
-        iact_ << "NA" << " ";
+      if(sokal(*iter/(*subsample),&mumcse[g**iter/(*subsample)],&var,&tau,&m)!=0) {
+        mumcse_ << *iter/(*subsample) << " ";
+        muiact_ << "NA" << " ";
       } else {
-        mcse_ << tau*var**subsample/(*iter) << " ";
-        iact_ << tau << " ";
+        mumcse_ << tau*var**subsample/(*iter) << " ";
+        muiact_ << tau << " ";
       }
     }
-    mcse_ << endl;
-    iact_ << endl;
+    mumcse_ << endl;
+    muiact_ << endl;
   }
-  mcse_.close();
-  iact_.close();
+  mumcse_.close();
+  muiact_.close();
   for(int c=0; c<*conditions; ++c) mu_[c].close();
-  delete [] mcse;
+  delete [] mumcse;
 
   // In the parallel version, memory that is allocated by all nodes is deallocated here rather than above.
   // We do the same here for code structure compatibility.
