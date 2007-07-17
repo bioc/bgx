@@ -16,7 +16,7 @@
 
 
 "bgx" <-
-function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536,output=c("minimal","trace","all"), serial=FALSE, probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, basepath=file.path(tempdir(),"bgx")) {
+function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536,output=c("minimal","trace","all"), probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, basepath=file.path(tempdir(),"bgx")) {
 #  if(burnin %% 1024 != 0 || iter %% 1024 != 0)
 #    stop("\"iter\" and \"burnin\" must be a multiple of 1024")
   # create directory where runs will be saved if necessary
@@ -49,21 +49,11 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   firstProbeInEachGeneToWatch = vars$firstProbeInEachGeneToWatch
   numArrays<-vars$numArrays
 
-  if(serial) {
-    samplesets=1
-    for(c in 1:numArrays) {
-      outdir=mcmc.bgx(as.matrix(pm[,c]),as.matrix(mm[,c]),samplesets,probesets,numberOfCategories, categories,
-        unknownProbeSeqs, numberOfUnknownProbeSeqs, numberOfGenesToWatch, genesToWatch, 
-        firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData)[c], basepath=basepath) 
-      cat("CEL file ",sampleNames(aData)[c]," analysed.\n")
-    }
-  } else {
-    outdir=mcmc.bgx(pm,mm,samplesets,probesets,numberOfCategories, categories, unknownProbeSeqs, 
-    numberOfUnknownProbeSeqs,
-    numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), basepath=basepath)
-    cat("CEL files analysed: ")
-    for(c in 1:numArrays) cat(sampleNames(aData)[c]," ")
-  }
+  outdir=mcmc.bgx(pm,mm,samplesets,probesets,numberOfCategories, categories, unknownProbeSeqs, 
+  numberOfUnknownProbeSeqs,
+  numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), basepath=basepath)
+  cat("CEL files analysed: ")
+  for(c in 1:numArrays) cat(sampleNames(aData)[c]," ")
   
   if(probeAff) saveAffinityPlot.bgx(originalAffinities, categories, outdir, probecat_threshold)
   write(geneNames(aData)[genes], file=file.path(outdir,"geneNames.txt"))

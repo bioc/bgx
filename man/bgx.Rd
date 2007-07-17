@@ -10,7 +10,7 @@
 }
 \usage{
 bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
-  burnin = 16384, iter = 65536, output = c("minimal","trace","all"), serial = FALSE, 
+  burnin = 16384, iter = 65536, output = c("minimal","trace","all"), 
   probeAff = TRUE, probecat_threshold = 100, adaptive = TRUE, basepath = file.path(tempdir(), "bgx"))
 
 standalone.bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
@@ -27,7 +27,6 @@ standalone.bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
   \item{burnin}{Number of burn-in iterations.}
   \item{iter}{Number of post burn-in iterations.}
   \item{output}{One of "minimal", "trace" or "all". See below for details.}
-  \item{serial}{Run a separate simulation for each individual array.}
   \item{probeAff}{Stratify the mean (lambda) of the cross-hybridisation parameter (H) by categories according to probe-level sequence information.}
   \item{probecat_threshold}{Minimum amount of probes per probe affinity category.}
   \item{adaptive}{Adapt the variance of the proposals for Metropolis Hastings objects (that is: S, H, Lambda, Eta, Sigma and Mu).}

@@ -78,13 +78,13 @@ plotExpressionDensity <- function(bgxOutput, gene=NULL, normalize=c("none","mean
 }
 
 ### Plot densities of differential expression between two conditions
-plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("none","mean","loess"), ...) {
+plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("none","mean","loess"), normgenes=length(bgxOutput[["geneNames"]]), ...) {
   if(is.null(gene)) stop("Please specify a genes index/name.")
   if(is.character(gene)) gene <- (1:length(bgxOutput$geneNames))[gene == bgxOutput$geneNames]
   if(length(conditions) !=2 ) stop("Please specify exactly two conditions (e.g. conditions=c(1,2)).")
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
-  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1])
+  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1], normgenes=normgenes)
 
   diff <- bgxOutput$mu[[conditions[2]]][gene,] - bgxOutput$mu[[conditions[1]]][gene,] 
   
@@ -94,10 +94,10 @@ plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("n
 }
 
 ### Plot sorted DE of genes and return this in a matrix 
-plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess")) {
+plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=length(bgxOutput[["geneNames"]])) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
-  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1])
+  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1],normgenes=normgenes)
 
   mu_diff <- bgxOutput$mu[[conditions[2]]] - bgxOutput$mu[[conditions[1]]]
   de <- c()
@@ -111,10 +111,10 @@ plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", 
 }
 
 ### Plot sorted 2.5-97.5% CI of DE (not absolute value)
-plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), ymax=NULL) {
+plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=length(bgxOutput[["geneNames"]]), ymax=NULL) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
-  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1])
+  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1], normgenes=normgenes)
 
   mu_diff <- bgxOutput$mu[[conditions[2]]] - bgxOutput$mu[[conditions[1]]]
   
@@ -140,10 +140,11 @@ plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean"
 }
 
 ### Estimate proportion of DE genes. Method similar to Efron
-plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), df=floor(1.8*log10(length(bgxOutput[["geneNames"]])))) {
+plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), 
+  normgenes=length(bgxOutput[["geneNames"]]), df=floor(1.8*log10(length(bgxOutput[["geneNames"]])))) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
-  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1])
+  else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1], normgenes)
 
   diff <- bgxOutput$mu[[conditions[2]]] - bgxOutput$mu[[conditions[1]]]
   pp <- c()
@@ -283,13 +284,13 @@ meanNorm <- function(mu, target=1) {
   return(mu)
 }
 
-loessNorm <- function(mu,target=1) {
+loessNorm <- function(mu,target=1, normgenes=nrow(mu[[target]])) {
   if(length(mu)>1) {
     for(i in c(1:length(mu))[!c(1:length(mu))==target]){
       muave <- matrix(nrow=nrow(mu[[1]]), ncol=2)
       muave[,1] <- apply(mu[[target]],1,mean)
       muave[,2] <- apply(mu[[i]],1,mean)
-      muaveSubset <- data.frame(M = muave[,2] - muave[,1], A = 0.5*(muave[,1] + muave[,2]))
+      muaveSubset <- data.frame(M = muave[normgenes,2] - muave[normgenes,1], A = 0.5*(muave[normgenes,1] + muave[normgenes,2]))
       muaveSubsetLoess <- loess(M~A, muaveSubset, span=0.1)
       predMuaveSubsetLoess <- predict(muaveSubsetLoess, data.frame(A=0.5*(muave[,1]+muave[,2])),se=FALSE)
       mu[[i]] <- mu[[i]] - predMuaveSubsetLoess 
