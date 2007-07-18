@@ -143,17 +143,17 @@ function(data,samplesets,genes,genesToWatch,probeAff,probecat_threshold, roundin
     }
     else if(sum(samplesets)!=numArrays)
       stop("Samplesets not sensible.  You have ", numArrays, " arrays, but sum(samplesets) = ",sum(samplesets))
-    cat("Analysing",numArrays,"array(s) in", length(samplesets), "condition(s):\n")
+    cat("Analyse",numArrays,"array(s) in", length(samplesets), "condition(s):\n")
     for(a in 1:length(samplesets)){
       cat("\t- condition ",a,": ",samplesets[a], " array(s)\n",sep="")
     }
 
     if(is.null(genes)) {
-      cat("Analysing all genes\n")
+      cat("Analyse all genes\n")
       geneNames<-geneNames(data)
       genes<-seq(1,length(geneNames))
     } else {
-      cat("Analysing genes ",integersToNiceString(genes),"\n")
+      cat("Analyse genes ",integersToNiceString(genes),"\n")
       geneNames<-geneNames(data)[genes]
     }
     

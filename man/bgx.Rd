@@ -65,7 +65,7 @@ G.O. Roberts and J.S. Rosenthal (September, 2006) Examples of Adaptive MCMC.}
   if(require(affydata) && require(hgu95av2cdf)) {
     data(Dilution)
     eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=4096, iter=8192,
-      genes=c(12500:12599), output="all", rundir=file.path(tempdir(), "bgxExampleRun"))
+      genes=c(12500:12599), output="all", rundir=file.path(tempdir()))
   }
 }
 \keyword{manip}% at least one, from doc/KEYWORDS

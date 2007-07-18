@@ -31,8 +31,6 @@ function(pm,mm,samplesets,probesets,numberCategories,categories,unknownProbeSeqs
   else if(output=="all") out.ind<-2
   else stop("Invalid value for \"output\" parameter.")
 
-  cat("Starting MCMC simulation...\n")
- 
   # free allocated memory on user interrupt/end of simulation
   on.exit(.C("freeBGXMemory", as.integer(out.ind), as.integer(numberGenesToWatch), PACKAGE = "bgx"))
 
