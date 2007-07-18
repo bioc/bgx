@@ -198,7 +198,7 @@ function(data,samplesets,genes,genesToWatch,probeAff,probecat_threshold, roundin
       genesToWatch <- numeric(0) 
       firstProbeInEachGeneToWatch <- numeric(0)
     } else {
-      cat("Parameter 'genesToWatch' set. Monitoring genes ",genesToWatch," in detail.\n")
+      cat("Parameter 'genesToWatch' set. Monitoring genes ", integersToNiceString(genesToWatch)," in detail.\n")
       firstProbeInEachGeneToWatch <- vector(mode="integer", length=length(genesToWatch))
       for(g in 1:length(genesToWatch)){
         firstProbeInEachGeneToWatch[g] <- sum(probesets[1:genesToWatch[g]-1]) + 1
