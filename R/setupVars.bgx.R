@@ -171,7 +171,7 @@ function(data,samplesets,genes,genesToWatch,probeAff,probecat_threshold, roundin
     for(i in 1:length(ipAll)) probesetsAll[i]=length(ipAll[[i]])
     
     if(probeAff){
-      cat("Taking into account probe affinities (threshold is ", probecat_threshold, " probes per category)\n")
+      cat("Take into account probe affinities (threshold is ", probecat_threshold, " probes per category)\n")
       countProbes=0
       theProbes=vector(mode="integer", length=sum(probesetsAll[genes]))
       for(g in 1:length(genes)){
@@ -198,11 +198,13 @@ function(data,samplesets,genes,genesToWatch,probeAff,probecat_threshold, roundin
       genesToWatch <- numeric(0) 
       firstProbeInEachGeneToWatch <- numeric(0)
     } else {
-      cat("Parameter 'genesToWatch' set. Monitoring genes ", integersToNiceString(genesToWatch)," in detail.\n")
+      cat("Parameter 'genesToWatch' set. Monitor genes ", integersToNiceString(genesToWatch)," in detail.\n")
       firstProbeInEachGeneToWatch <- vector(mode="integer", length=length(genesToWatch))
       for(g in 1:length(genesToWatch)){
         firstProbeInEachGeneToWatch[g] <- sum(probesets[1:genesToWatch[g]-1]) + 1
       }
+      genesToWatch <- genesToWatch - 1 # In C we start from 0
+      firstProbeInEachGeneToWatch <- firstProbeInEachGeneToWatch - 1 # ibid
     }
     
     return(list(pm=pm,mm=mm,samplesets=samplesets,probesets=probesets,

@@ -52,8 +52,6 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   outdir=mcmc.bgx(pm,mm,samplesets,probesets,numberOfCategories, categories, unknownProbeSeqs, 
   numberOfUnknownProbeSeqs,
   numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), rundir=rundir)
-#  cat("CEL files analysed: ")
- # for(c in 1:numArrays) cat(sampleNames(aData)[c]," ")
   
   if(probeAff) saveAffinityPlot.bgx(originalAffinities, categories, outdir, probecat_threshold)
   write(geneNames(aData)[genes], file=file.path(outdir,"geneNames.txt"))

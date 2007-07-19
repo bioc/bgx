@@ -19,7 +19,7 @@
  *
  */
 
-#define BGXDEBUG 0
+#define FULLTRACES 0
 
 #include "rand.hh"
 #include "rundir.hh"
@@ -555,11 +555,12 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   Tau = new Tau_T(tau,PM,MM,s,h,phi,beta,0.001,0.001,&rand);
 
-#if BGXDEBUG
-  ofstream fullMuTrace_((run_dir + "/fullMuTrace").c_str());
-#endif
-
   PRINTF("Starting MCMC simulation...\n");
+
+#if FULLTRACES
+  #warning "#FULLTRACES set to 1: outputting traces of both burn-in and sampling stages"
+  PRINTF("Warning: #FULLTRACES set to 1: outputting traces of both burn-in and sampling stages\n");
+#endif
 
   time_t start_time, end_time;
   time(&start_time);
@@ -572,15 +573,59 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     R_CheckUserInterrupt();
 #endif
 
-#if BGXDEBUG
-  if(sweep%8 == 0) {
-    for(int c=0; c < *conditions; c++) {
-      for(int g=0; g < *genes; g+=40) {
-        fullMuTrace_ << mu[c][g] << " ";
+#if FULLTRACES // Output burn-in subsample traces too!
+    if(!(sweep%*subsample)){
+      for(int c=0; c<*conditions; ++c){
+        for(int g=0; g<*genes; ++g) {
+          mu_[c] << mu[c][g] << '\t';
+        }
+        mu_[c] << '\n';
       }
-      fullMuTrace_ << endl;
+
+      if(*output >= BGXTRACE){
+        for(int c=0; c<*conditions; ++c){
+          for(int g=0; g<*genes; ++g) {
+            sigma_[c] << 1.0/sigma[c][g] << '\t';
+          }
+          sigma_[c] << '\n';
+        }
+        
+        phi_ << phi << endl;
+
+        for(int sample=0; sample<*samples; ++sample){
+          tau_ << 1/tau[sample] << '\t';
+          eta_ << 1/eta[sample] << '\t';
+          for(int c=0; c<*numberCategories; ++c){
+            lambda_[sample] << lambda[sample][c] << '\t';
+           // etas_[sample] << 1.0/etas[sample][c] << '\t';
+          }
+          lambda_[sample] << '\n';
+         // etas_[sample] << '\n';
+        }
+        tau_ << '\n';
+     // lambda_ << '\n';
+        eta_ << '\n';
+
+        if(*numberOfUnknownProbeSeqs) {
+          for(int i=0; i < *numberOfUnknownProbeSeqs;i++) unkcats_ << categories[unknownProbeSeqs[i]] << '\t';
+          unkcats_ << endl;
+        }
+      }
+ 
+      if(*numberGenesToWatch>0) {
+        for(int sample=0; sample<*samples; ++sample){
+          for(int g=0; g<*numberGenesToWatch; g++){
+            for(int p=0; p<probesets[whichGenesToWatch[g]]; p++){
+              // output x and y
+              XS[sample] << log(s[sample][(whichProbesToWatch[g])+p]+1) << '\t';
+              YS[sample] << log(h[sample][(whichProbesToWatch[g])+p]+1) << '\t';
+            }
+          }
+          XS[sample] << '\n';
+          YS[sample] << '\n';
+        }
+      }
     }
-  }
 #endif
 
     if(*numberOfUnknownProbeSeqs) I.Update();
@@ -626,17 +671,6 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     if(sweep%16 == 0) FLUSH
 #ifdef USING_R
     R_CheckUserInterrupt();
-#endif
-
-#if BGXDEBUG
-  if(sweep%8 == 0) {
-    for(int c=0; c < *conditions; c++) {
-      for(int g=0; g < *genes; g++) {
-        fullMuTrace_ << mu[c][g] << " ";
-      }
-      fullMuTrace_ << endl;
-    }
-  }
 #endif
 
     if(*numberOfUnknownProbeSeqs) I.Update();
@@ -726,8 +760,8 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
           for(int g=0; g<*numberGenesToWatch; g++){
             for(int p=0; p<probesets[whichGenesToWatch[g]]; p++){
               // output x and y
-              XS[sample] << log(s[sample][(whichProbesToWatch[g]-1)+p]+1) << '\t';
-              YS[sample] << log(h[sample][(whichProbesToWatch[g]-1)+p]+1) << '\t';
+              XS[sample] << log(s[sample][(whichProbesToWatch[g])+p]+1) << '\t';
+              YS[sample] << log(h[sample][(whichProbesToWatch[g])+p]+1) << '\t';
             }
           }
           XS[sample] << '\n';
@@ -746,11 +780,6 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   summary << "MCMC duration:\t" <<  duration/3600 << "h " << duration%3600/60 << "m " << duration%60 << "s\n";
   summary.close();
-
-#if BGXDEBUG
-  fullMuTrace_.close();
-#endif
-
 
   for(int c=0; c<*conditions; ++c){
     for(int g=0; g<*genes; ++g){
