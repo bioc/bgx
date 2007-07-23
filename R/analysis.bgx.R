@@ -78,7 +78,7 @@ plotExpressionDensity <- function(bgxOutput, gene=NULL, normalize=c("none","mean
 }
 
 ### Plot densities of differential expression between two conditions
-plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("none","mean","loess"), normgenes=length(bgxOutput[["geneNames"]]), ...) {
+plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("none","mean","loess"), normgenes=c(1:length(bgxOutput[["geneNames"]])), ...) {
   if(is.null(gene)) stop("Please specify a genes index/name.")
   if(is.character(gene)) gene <- (1:length(bgxOutput$geneNames))[gene == bgxOutput$geneNames]
   if(length(conditions) !=2 ) stop("Please specify exactly two conditions (e.g. conditions=c(1,2)).")
@@ -94,7 +94,7 @@ plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("n
 }
 
 ### Plot sorted DE of genes and return this in a matrix 
-plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=length(bgxOutput[["geneNames"]])) {
+plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=c(1:length(bgxOutput[["geneNames"]]))) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
   else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1],normgenes=normgenes)
@@ -111,7 +111,7 @@ plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", 
 }
 
 ### Plot sorted 2.5-97.5% CI of DE (not absolute value)
-plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=length(bgxOutput[["geneNames"]]), ymax=NULL) {
+plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=c(1:length(bgxOutput[["geneNames"]])), ymax=NULL) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
   else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1], normgenes=normgenes)
@@ -141,7 +141,7 @@ plotDiffRank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean"
 
 ### Estimate proportion of DE genes. Method similar to Efron
 plotDEHistogram <- function(bgxOutput, conditions=c(1,2), normalize=c("none", "mean", "loess"), 
-  normgenes=length(bgxOutput[["geneNames"]]), df=floor(1.8*log10(length(bgxOutput[["geneNames"]])))) {
+  normgenes=c(1:length(bgxOutput[["geneNames"]])), df=floor(1.8*log10(length(bgxOutput[["geneNames"]])))) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
   else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1], normgenes)
@@ -284,7 +284,7 @@ meanNorm <- function(mu, target=1) {
   return(mu)
 }
 
-loessNorm <- function(mu,target=1, normgenes=nrow(mu[[target]])) {
+loessNorm <- function(mu,target=1, normgenes=c(1:nrow(mu[[target]]))) {
   if(length(mu)>1) {
     for(i in c(1:length(mu))[!c(1:length(mu))==target]){
       muave <- matrix(nrow=nrow(mu[[1]]), ncol=2)
