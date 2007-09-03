@@ -93,21 +93,36 @@ plotDEDensity <- function(bgxOutput, gene=NULL, conditions=c(1,2),normalize=c("n
 
 }
 
-### Plot sorted DE of genes and return this in a matrix 
-plotDERank <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=c(1:length(bgxOutput[["geneNames"]]))) {
+### Rank genes by deifferential expression
+rankByDE <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "loess"), normgenes=c(1:length(bgxOutput[["geneNames"]])), absolute=TRUE) {
   normalize <- match.arg(normalize)
   if(normalize=="mean") bgxOutput$mu <- meanNorm(bgxOutput$mu, target=conditions[1])
   else if(normalize=="loess") bgxOutput$mu <- loessNorm(bgxOutput$mu, target=conditions[1],normgenes=normgenes)
 
   mu_diff <- bgxOutput$mu[[conditions[2]]] - bgxOutput$mu[[conditions[1]]]
   de <- c()
-  for(i in 1:nrow(bgxOutput$mu[[1]])) de[i] <- abs(mean(mu_diff[i,]))/sd(mu_diff[i,])
+  tau <- var <- m <- 0
+  for(i in 1:nrow(bgxOutput$mu[[1]])) {
+    temp <- mu_diff[i,]
+
+    # alternative: using sokal function
+    # sok <- .C("sokal", as.integer(1024), as.double(temp), as.double(var), as.double(tau), as.integer(m))
+    # mcse <- sqrt(1023*sok[[3]]*sok[[4]]/(1024*(1024-sok[[4]])))
+
+    tau <- 1
+    a <- acf(temp, plot=FALSE)
+    maxlag <- max(a$lag)
+    for(j in 2:maxlag) tau <- tryCatch(tau + 2 * (1-a$lag[j]/maxlag) * a$acf[j], error= function(e) NaN)
+    mcse <- sqrt((a$n.used-1)*tau*var(temp)/(a$n.used*(a$n.used-tau)))
+    
+    if(absolute) de[i] <- abs(mean(mu_diff[i,]))/mcse
+    else de[i] <- mean(mu_diff[i,])/mcse
+  }
+
+  de[which(is.nan(de))] <- max(de, na.rm=T) # Get rid of NaNs returned in sokal()
   order <- sort(de,decreasing=TRUE, index.return=TRUE)$ix
 
-  plot(c(1:nrow(bgxOutput$mu[[1]])), de[order], cex=0.5, pch=19, xlab="rank", ylab="Differential expression", 
-    main=paste("Sorted differential expression between cond", conditions[1], " and cond",conditions[2],"\nnormalisation: ",normalize))
-
- return(matrix(c(order,de[order]), dimnames=list( c(bgxOutput$geneNames[order]), c("Position", "DiffExpression")), ncol=2))
+  return(matrix(c(order,de[order]), dimnames=list( c(bgxOutput$geneNames[order]), c("Position", "DiffExpression")), ncol=2))
 }
 
 ### Plot sorted 2.5-97.5% CI of DE (not absolute value)

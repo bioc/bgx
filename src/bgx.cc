@@ -872,11 +872,12 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
       double var=0;
       double tau=0;
       int m=0;
-      if(sokal(*iter/(*subsample),&mumcse[g**iter/(*subsample)],&var,&tau,&m)!=0) {
+      int len=*iter/(*subsample);
+      if(sokal(&len,&mumcse[g**iter/(*subsample)],&var,&tau,&m)!=0) {
         mumcse_ << *iter/(*subsample) << " ";
         muiact_ << "NA" << " ";
       } else {
-        mumcse_ << tau*var**subsample/(*iter) << " ";
+        mumcse_ << sqrt(tau*var**subsample/(*iter)) << " ";
         muiact_ << tau << " ";
       }
     }

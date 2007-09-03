@@ -59,11 +59,13 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   # this should be an argument
   conditionnames <- paste("condition",c(1:length(samplesets)))
 
-  return(new('ExpressionSet',
+  eset <- new('ExpressionSet',
     exprs = matrix(data=scan(file.path(outdir,"muave"),quiet=TRUE),nrow=length(genes),ncol=length(samplesets),
       dimnames=list(geneNames(aData)[genes],conditionnames)),
     phenoData = new("AnnotatedDataFrame", data=as.data.frame(matrix(c(1:length(samplesets)),dimnames=list(c(conditionnames),c("condition")))), varMetadata=as.data.frame(list(labelDescription="Arbitrary numbering"), row.names="condition")),
     annotation = annotation(aData),
-    experimentData = description(aData)))
+    experimentData = description(aData))
+  eset <- assayDataElementReplace(eset, "se.exprs", matrix(data=scan(file.path(outdir,"mumcse"),quiet=TRUE),nrow=length(genes),ncol=length(samplesets), dimnames=list(geneNames(aData)[genes],conditionnames)))
+  return(eset)
 }
 

@@ -48,7 +48,7 @@ This will read in the CEL files in alphabetical order and save the data in the \
 \end{Sinput}
 
 \section{Running BGX through R}
-A basic execution of the program can be performed by simply passing an \Robject{AffyBatch} object as a single parameter to the \Robject{bgx} function and saving the result in an \Robject{ExpressionSet} object. The result will hold array-specific gene expression values accessible via \Rfunction{exprs(eset)}.
+A basic execution of the program can be performed by simply passing an \Robject{AffyBatch} object as a single parameter to the \Robject{bgx} function and saving the result in an \Robject{ExpressionSet} object. The result will hold array-specific gene expression values and their corresponding standard errors in \Robject{assayData(eset)\$exprs} and \Robject{assayData(eset)\$se.exprs} respectively.
 
 \begin{Sinput}
 > eset <- bgx(aData)
@@ -68,7 +68,7 @@ eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,
 The \Robject{eset} object will contain gene expression information for each gene under each condition (not necessarily each array). You may obtain the gene expression measure using the \Rfunction{exprs} function. For instance:
 
 <<>>=
-exprs(eset)[10:40,]
+exprs(eset)[10:40,] # Shorthand for assayData(eset)\$exprs[10:40,]
 @
 
 Run \Rfunction{help(ExpressionSet)} in R for more information.
@@ -109,14 +109,11 @@ You may then pass the \Robject{bgxOutput} object to any of several analysis func
 plotExpressionDensity(bgxOutput, gene=10)
 @
 
-In order to view a plot of ranked differential expression values and save these in a matrix, you could do:
-
-<<fig=TRUE>>=
-rankedGeneList <- plotDERank(bgxOutput)
-@
+In order to get a list of ranked differential expression values, you could do:
 
 <<echo=T>>=
-print(rankedGeneList[1:25,])
+rankedGeneList <- rankByDE(bgxOutput)
+print(rankedGeneList[1:25,]) # print top 25 DEG
 @
 
 Run \Rfunction{help(analysis.bgx)} for more detailed usage instructions on the analysis functions.

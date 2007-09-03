@@ -25,6 +25,7 @@
 #ifndef _SOKAL_H
 #define _SOKAL_H
 
-int sokal(int n, double *x, double *var, double *tau, int* m);
-
+extern "C" {
+int sokal(int *n, double *x, double *var, double *tau, int* m);
+}
 #endif // _SOKAL_H

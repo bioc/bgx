@@ -156,6 +156,9 @@ function(data,samplesets,genes,genesToWatch,probeAff,probecat_threshold, roundin
       cat("Analyse genes ",integersToNiceString(genes),"\n")
       geneNames<-geneNames(data)[genes]
     }
+
+    if(any(!(genesToWatch %in% genes)))
+      stop("Sorry, 'genesToWatch' contains genes not in c(1:genes).")
     
     pm<-pm(data, geneNames)
     mm<-mm(data, geneNames)

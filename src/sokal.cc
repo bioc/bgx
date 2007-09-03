@@ -31,8 +31,9 @@ int fft(double* xreal, double* ximag, int length);
 // twice Sokal's definition.  The implementation follows that of 
 // Green and Han (1990).
 // WARNING: The input array x is destroyed in the process.
-int sokal(int n, double *x, double *var, double *tau, int* m)
+int sokal(int *n_, double *x, double *var, double *tau, int* m)
 {
+  int n=*n_;
   if(n>2<<20)
     {
       std::cerr << "Auto-correlation length exceeded" << std::endl;
