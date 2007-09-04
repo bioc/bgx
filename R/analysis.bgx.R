@@ -105,15 +105,18 @@ rankByDE <- function(bgxOutput, conditions=c(1,2),normalize=c("none", "mean", "l
   for(i in 1:nrow(bgxOutput$mu[[1]])) {
     temp <- mu_diff[i,]
 
-    # alternative: using sokal function
-    # sok <- .C("sokal", as.integer(1024), as.double(temp), as.double(var), as.double(tau), as.integer(m))
-    # mcse <- sqrt(1023*sok[[3]]*sok[[4]]/(1024*(1024-sok[[4]])))
+    # using sokal function
+    var <- tau <- 0.0
+    m <- 0
+    sok <- .C("sokal", as.integer(1024), as.double(temp), as.double(var), as.double(tau), as.integer(m))
+    mcse <- sqrt(1023*sok[[3]]*sok[[4]]/(1024*(1024-sok[[4]])))
 
-    tau <- 1
-    a <- acf(temp, plot=FALSE)
-    maxlag <- max(a$lag)
-    for(j in 2:maxlag) tau <- tryCatch(tau + 2 * (1-a$lag[j]/maxlag) * a$acf[j], error= function(e) NaN)
-    mcse <- sqrt((a$n.used-1)*tau*var(temp)/(a$n.used*(a$n.used-tau)))
+    # slow
+    #tau <- 1
+    #a <- acf(temp, plot=FALSE)
+    #maxlag <- max(a$lag)
+    #for(j in 2:maxlag) tau <- tryCatch(tau + 2 * (1-a$lag[j]/maxlag) * a$acf[j], error= function(e) NaN)
+    #mcse <- sqrt((a$n.used-1)*tau*var(temp)/(a$n.used*(a$n.used-tau)))
     
     if(absolute) de[i] <- abs(mean(mu_diff[i,]))/mcse
     else de[i] <- mean(mu_diff[i,])/mcse
