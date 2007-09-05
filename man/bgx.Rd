@@ -10,11 +10,11 @@
 }
 \usage{
 bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
-  burnin = 16384, iter = 65536, output = c("minimal","trace","all"), 
+  burnin = 8192, iter = 16384, output = c("minimal","trace","all"), 
   probeAff = TRUE, probecat_threshold = 100, adaptive = TRUE, rundir = ".")
 
 standalone.bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
-  burnin = 16384, iter = 65536, output = c("minimal", "trace", "all"),
+  burnin = 8192, iter = 16384, output = c("minimal", "trace", "all"),
   probeAff = TRUE, probecat_threshold = 100,
   adaptive = TRUE, batch_size = 50, optimalAR = 0.44, inputdir = "input")
 }

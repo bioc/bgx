@@ -16,7 +16,7 @@
 
 
 "bgx" <-
-function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536,output=c("minimal","trace","all"), probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, rundir=".") {
+function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=8192,iter=16384,output=c("minimal","trace","all"), probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, rundir=".") {
 #  if(burnin %% 1024 != 0 || iter %% 1024 != 0)
 #    stop("\"iter\" and \"burnin\" must be a multiple of 1024")
   # create directory where runs will be saved if necessary
