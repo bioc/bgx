@@ -10,13 +10,13 @@
 }
 \usage{
 bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
-  burnin = 16384, iter = 65536, output = c("minimal","trace","all"), serial = FALSE, 
-  probeAff = TRUE, probecat_threshold = 100, adaptive = TRUE, basepath = file.path(tempdir(), "bgx"))
+  burnin = 8192, iter = 16384, output = c("minimal","trace","all"), 
+  probeAff = TRUE, probecat_threshold = 100, adaptive = TRUE, rundir = ".")
 
 standalone.bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
-  burnin = 16384, iter = 65536, output = c("minimal", "trace", "all"),
+  burnin = 8192, iter = 16384, output = c("minimal", "trace", "all"),
   probeAff = TRUE, probecat_threshold = 100,
-  adaptive = TRUE, batch_size = 50, optimalAR = 0.44, dirname = "input")
+  adaptive = TRUE, batch_size = 50, optimalAR = 0.44, inputdir = "input")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -27,14 +27,13 @@ standalone.bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
   \item{burnin}{Number of burn-in iterations.}
   \item{iter}{Number of post burn-in iterations.}
   \item{output}{One of "minimal", "trace" or "all". See below for details.}
-  \item{serial}{Run a separate simulation for each individual array.}
   \item{probeAff}{Stratify the mean (lambda) of the cross-hybridisation parameter (H) by categories according to probe-level sequence information.}
   \item{probecat_threshold}{Minimum amount of probes per probe affinity category.}
   \item{adaptive}{Adapt the variance of the proposals for Metropolis Hastings objects (that is: S, H, Lambda, Eta, Sigma and Mu).}
   \item{batch_size}{Size of batches for calculating acceptance ratios and updating jumps.}
   \item{optimalAR}{Optimal acceptance ratio.}
-  \item{basepath}{The directory in which to place the output run directories. By default this is the "bgx" directory in the R temporary directory, which you can obtain by using \code{tempdir()}.}
-  \item{dirname}{The name of the directory in which to place the files for standalone binary.}
+  \item{rundir}{The directory in which to save the output runs.}
+  \item{inputdir}{The name of the directory in which to place the input files for the standalone binary.}
 }
 \details{
   \itemize{
@@ -66,7 +65,7 @@ G.O. Roberts and J.S. Rosenthal (September, 2006) Examples of Adaptive MCMC.}
   if(require(affydata) && require(hgu95av2cdf)) {
     data(Dilution)
     eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=4096, iter=8192,
-      genes=c(12500:12599), output="all")
+      genes=c(12500:12599), output="all", rundir=file.path(tempdir()))
   }
 }
 \keyword{manip}% at least one, from doc/KEYWORDS

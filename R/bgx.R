@@ -16,12 +16,12 @@
 
 
 "bgx" <-
-function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536,output=c("minimal","trace","all"), serial=FALSE, probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, basepath=file.path(tempdir(),"bgx")) {
+function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=8192,iter=16384,output=c("minimal","trace","all"), probeAff=TRUE, probecat_threshold = 100, adaptive=TRUE, rundir=".") {
 #  if(burnin %% 1024 != 0 || iter %% 1024 != 0)
 #    stop("\"iter\" and \"burnin\" must be a multiple of 1024")
   # create directory where runs will be saved if necessary
-  if(.Platform$OS.type=="windows") basepath <- gsub("\\\\","/",basepath) # Use / as file separator
-  if(!file.exists(basepath)) dir.create(basepath)
+  if(.Platform$OS.type=="windows") rundir <- gsub("\\\\","/",rundir) # Use / as file separator
+  if(!file.exists(rundir)) dir.create(rundir)
 
   # do not analyse the same gene more than once, even if specified in the arguments
   genes <- unique(genes); genesToWatch <- unique(genesToWatch)
@@ -49,36 +49,23 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   firstProbeInEachGeneToWatch = vars$firstProbeInEachGeneToWatch
   numArrays<-vars$numArrays
 
-  if(serial) {
-    samplesets=1
-    for(c in 1:numArrays) {
-      outdir=mcmc.bgx(as.matrix(pm[,c]),as.matrix(mm[,c]),samplesets,probesets,numberOfCategories, categories,
-        unknownProbeSeqs, numberOfUnknownProbeSeqs, numberOfGenesToWatch, genesToWatch, 
-        firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData)[c], basepath=basepath) 
-      cat("CEL file ",sampleNames(aData)[c]," analysed.\n")
-    }
-  } else {
-    outdir=mcmc.bgx(pm,mm,samplesets,probesets,numberOfCategories, categories, unknownProbeSeqs, 
-    numberOfUnknownProbeSeqs,
-    numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), basepath=basepath)
-    cat("CEL files analysed: ")
-    for(c in 1:numArrays) cat(sampleNames(aData)[c]," ")
-  }
+  outdir=mcmc.bgx(pm,mm,samplesets,probesets,numberOfCategories, categories, unknownProbeSeqs, 
+  numberOfUnknownProbeSeqs,
+  numberOfGenesToWatch,genesToWatch,firstProbeInEachGeneToWatch,iter,burnin,adaptive, output=output,samplenames=sampleNames(aData), rundir=rundir)
   
   if(probeAff) saveAffinityPlot.bgx(originalAffinities, categories, outdir, probecat_threshold)
   write(geneNames(aData)[genes], file=file.path(outdir,"geneNames.txt"))
   
-  cat("\nFiles in '",outdir,"'\n",sep="")
-  cat("Run(s) finished.\n")
-
   # this should be an argument
   conditionnames <- paste("condition",c(1:length(samplesets)))
 
-  return(new('ExpressionSet',
+  eset <- new('ExpressionSet',
     exprs = matrix(data=scan(file.path(outdir,"muave"),quiet=TRUE),nrow=length(genes),ncol=length(samplesets),
       dimnames=list(geneNames(aData)[genes],conditionnames)),
     phenoData = new("AnnotatedDataFrame", data=as.data.frame(matrix(c(1:length(samplesets)),dimnames=list(c(conditionnames),c("condition")))), varMetadata=as.data.frame(list(labelDescription="Arbitrary numbering"), row.names="condition")),
     annotation = annotation(aData),
-    experimentData = description(aData)))
+    experimentData = description(aData))
+  eset <- assayDataElementReplace(eset, "se.exprs", matrix(data=scan(file.path(outdir,"mumcse"),quiet=TRUE),nrow=length(genes),ncol=length(samplesets), dimnames=list(geneNames(aData)[genes],conditionnames)))
+  return(eset)
 }
 

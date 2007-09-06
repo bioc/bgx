@@ -9,7 +9,7 @@
 mcmc.bgx(pm, mm, samplesets, probesets, numberCategories, categories, unknownProbeSeqs, numberOfUnknownProbeSeqs, 
   numberGenesToWatch, whichGenesToWatch, whichProbesToWatch, iter, burnin,
   adaptive, batch_size=50, optimalAR=0.44, output, samplenames = "unknown",
-  subsample = ifelse(iter > 1024, iter/1024, 1), seed = 192492, basepath)
+  subsample = ifelse(iter > 1024, iter/1024, 1), seed = 192492, rundir)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -33,7 +33,7 @@ mcmc.bgx(pm, mm, samplesets, probesets, numberCategories, categories, unknownPro
   \item{samplenames}{Vector of names for each array.}
   \item{subsample}{Subsampling interval.}
   \item{seed}{Seed for PRNG.}
-  \item{basepath}{The directory in which to place the output run directories. By default this is the "bgx" directory in the R temporary directory, which you can obtain by using \code{tempdir()}.}
+  \item{rundir}{The directory in which to place the output run directories.}
 }
 \details{
 See \code{\link{bgx}} for more details.

@@ -22,12 +22,12 @@
 
 
 "standalone.bgx" <-
-function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65536, output=c("minimal","trace", "all"), probeAff=TRUE, probecat_threshold=100, adaptive = TRUE, batch_size=50, optimalAR=0.44, dirname="input") {
+function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=8192,iter=16384, output=c("minimal","trace", "all"), probeAff=TRUE, probecat_threshold=100, adaptive = TRUE, batch_size=50, optimalAR=0.44, inputdir="input") {
 #  if(burnin %% 1024 != 0 || iter %% 1024 != 0) stop("\"iter\" and \"burnin\" must be a multiple of 1024")
   output <- match.arg(output)
-  if(length(grep("[[:space:]]", dirname)) > 0) {
-    cat("Warning: removing space characters from dirname.")
-    dirname <- gsub("[[:space:]]","", dirname)
+  if(length(grep("[[:space:]]", inputdir)) > 0) {
+    warning("Removing space characters from inputdir")
+    inputdir <- gsub("[[:space:]]","", inputdir)
   }
   # not being able to pass by reference sucks.  
   vars <- setupVars.bgx(data=aData,samplesets=samplesets,genes=genes,genesToWatch=genesToWatch,probeAff=probeAff,probecat_threshold=probecat_threshold)
@@ -46,8 +46,8 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   firstProbeInEachGeneToWatch<-vars$firstProbeInEachGeneToWatch
   numArrays<-vars$numArrays
 
-  while(!is.na(file.info(dirname)$size)) {
-    cat("I tried to create a new directory named \"",dirname,"\" in which to place the standalone BGX files,
+  while(!is.na(file.info(inputdir)$size)) {
+    cat("I tried to create a new directory named \"",inputdir,"\" in which to place the standalone BGX files,
     but a file or directory with that name already exists.\n
     Would you like to:
     \t* overwrite it (o)
@@ -55,27 +55,27 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
     \t* abort (A)?\n",sep="")
     answer = scan(what=character(1), n=1)
     if(answer=="o" || answer=="O") {
-      cat("Overwriting \"", dirname, "\"\n",sep="")
-      unlink(dirname,recursive=TRUE)
+      cat("Overwriting \"", inputdir, "\"\n",sep="")
+      unlink(inputdir,recursive=TRUE)
     } else if(answer=="d" || answer=="D") {
       cat("Please choose a different directory name:\n")
-      dirname = scan(what=character(), n=1)
+      inputdir = scan(what=character(), n=1)
     } else stop("Aborting.")
   }
   
-  dir.create(dirname) 
+  dir.create(inputdir) 
 
-  write(pm,file.path(dirname, "PM.txt"))
-  write(mm,file.path(dirname,"MM.txt"))
-  write(probesets,file.path(dirname,"PS.txt"))
+  write(pm,file.path(inputdir, "PM.txt"))
+  write(mm,file.path(inputdir,"MM.txt"))
+  write(probesets,file.path(inputdir,"PS.txt"))
 
-  write(samplesets,file.path(dirname,"SS.txt"))
+  write(samplesets,file.path(inputdir,"SS.txt"))
 
-  write(categories,file.path(dirname,"categories.txt"))
-  write(unknownProbeSeqs,file.path(dirname,"unknownProbeSeqs.txt"))
+  write(categories,file.path(inputdir,"categories.txt"))
+  write(unknownProbeSeqs,file.path(inputdir,"unknownProbeSeqs.txt"))
   
-  write(genesToWatch,file.path(dirname,"genesToWatch.txt"))
-  write(firstProbeInEachGeneToWatch,file.path(dirname,"firstProbeInEachGeneToWatch.txt"))
+  write(genesToWatch,file.path(inputdir,"genesToWatch.txt"))
+  write(firstProbeInEachGeneToWatch,file.path(inputdir,"firstProbeInEachGeneToWatch.txt"))
 
   # create category summary table
   cats=sort(unique(categories))
@@ -85,26 +85,26 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
   categorySummaryTable[,1]=numInEachCat
   rownames(categorySummaryTable)=cats
   colnames(categorySummaryTable)="occurances"
-  write.table(categorySummaryTable,file.path(dirname,"categorySummaryTable.csv"))
-  if(probeAff) affinityPlotFile <- saveAffinityPlot.bgx(originalAffinities, categories, dirname, probecat_threshold)
-  write(geneNames(aData)[genes], file=file.path(dirname,"geneNames.txt"))
+  write.table(categorySummaryTable,file.path(inputdir,"categorySummaryTable.csv"))
+  if(probeAff) affinityPlotFile <- saveAffinityPlot.bgx(originalAffinities, categories, inputdir, probecat_threshold)
+  write(geneNames(aData)[genes], file=file.path(inputdir,"geneNames.txt"))
     
   cat(paste("samples ",numArrays,"\n",
     "conditions ",length(samplesets),"\n",
     "probes ",dim(pm)[1],"\n",
     "genes ",length(probesets),"\n",
-    "geneNamesFile ", file.path(dirname, "geneNames.txt"), "\n",
+    "geneNamesFile ", file.path(inputdir, "geneNames.txt"), "\n",
     "numberOfCategories ",length(unique(categories)),"\n",
     "numberOfGenesToWatch ",numberOfGenesToWatch,"\n",
-    "SampleSets ",file.path(dirname,"SS.txt"),"\n",
-    "ProbeSets ",file.path(dirname,"PS.txt"),"\n",
-    "Categories ",file.path(dirname,"categories.txt"),"\n",
-    "UnknownProbeSeqs ", file.path(dirname,"unknownProbeSeqs.txt"),"\n",
+    "SampleSets ",file.path(inputdir,"SS.txt"),"\n",
+    "ProbeSets ",file.path(inputdir,"PS.txt"),"\n",
+    "Categories ",file.path(inputdir,"categories.txt"),"\n",
+    "UnknownProbeSeqs ", file.path(inputdir,"unknownProbeSeqs.txt"),"\n",
     "numberOfUnknownProbeSeqs ", numberOfUnknownProbeSeqs,"\n",
-    "genesToWatch ",file.path(dirname,"genesToWatch.txt"),"\n",
-    "firstProbeInEachGeneToWatch ",file.path(dirname,"firstProbeInEachGeneToWatch.txt"),"\n",
-    "PM ",file.path(dirname,"PM.txt"),"\n",
-    "MM ",file.path(dirname,"MM.txt"),"\n",
+    "genesToWatch ",file.path(inputdir,"genesToWatch.txt"),"\n",
+    "firstProbeInEachGeneToWatch ",file.path(inputdir,"firstProbeInEachGeneToWatch.txt"),"\n",
+    "PM ",file.path(inputdir,"PM.txt"),"\n",
+    "MM ",file.path(inputdir,"MM.txt"),"\n",
     "seed ",192492,"\n",
     "sweeps ",iter,"\n",
     "burn-in ",burnin,"\n",
@@ -120,9 +120,9 @@ function(aData,samplesets=NULL,genes=NULL,genesToWatch=NULL,burnin=16384,iter=65
     "Eta_jmp 0.1\n",
     "CELfiles ", paste(sampleNames(aData), collapse=" "), "\n",
     if(probeAff)"affinityPlotFile ", if(probeAff)affinityPlotFile, sep=""),
-    file=file.path(dirname,"infile.txt"),append=TRUE)
+    file=file.path(inputdir,"infile.txt"),append=TRUE)
 
-    cat("Standalone BGX files are in \"",dirname,"\".\n",sep="")
-    return(dirname)
+    cat("Standalone BGX files are in \"",inputdir,"\".\n",sep="")
+    return(inputdir)
 }
 

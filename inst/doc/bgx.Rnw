@@ -48,13 +48,13 @@ This will read in the CEL files in alphabetical order and save the data in the \
 \end{Sinput}
 
 \section{Running BGX through R}
-A basic execution of the program can be performed by simply passing an \Robject{AffyBatch} object as a single parameter to the \Robject{bgx} function and saving the result in an \Robject{ExpressionSet} object. The result will hold array-specific gene expression values accessible via \Rfunction{exprs(eset)}.
+A basic execution of the program can be performed by simply passing an \Robject{AffyBatch} object as a single parameter to the \Robject{bgx} function and saving the result in an \Robject{ExpressionSet} object. The result will hold array-specific gene expression values and their corresponding standard errors in \Robject{assayData(eset)\$exprs} and \Robject{assayData(eset)\$se.exprs} respectively.
 
 \begin{Sinput}
 > eset <- bgx(aData)
 \end{Sinput}
 
-A more elaborate scenario would involve splitting the arrays into a number of conditions using the \Rfunarg{samplesets} argument\footnote{Note that if your \Robject{AffyBatch} object contains information on the experimental design in the \Robject{phenoData} slot, you do not need to use the \Rfunarg{samplesets} argument.}; specifying which genes to analyse with the \Rfunarg{genes} argument; specifying whether to take into account probe affinity with \Rfunarg{probeAff}; setting the number of burn-in and post burn-in runs with the \Rfunarg{burnin} and \Rfunarg{iter} arguments respectively; and setting the set of parameters to save with the \Rfunarg{output} argument\footnote{\Rfunarg{output} can be set to either "minimal", "trace" or "all". See the documentation for an explanation of what these levels mean}. Execute \Rfunction{help(bgx)} in R for a full explanation of all the parameters. 
+A more elaborate scenario would involve splitting the arrays into a number of conditions using the \Rfunarg{samplesets} argument\footnote{Note that if your \Robject{AffyBatch} object contains information on the experimental design in the \Robject{phenoData} slot, you do not need to use the \Rfunarg{samplesets} argument.}; specifying which genes to analyse with the \Rfunarg{genes} argument; specifying whether to take into account probe affinity with \Rfunarg{probeAff}; setting the number of burn-in and post burn-in runs with the \Rfunarg{burnin} and \Rfunarg{iter} arguments respectively; setting the set of parameters to save with the \Rfunarg{output} argument\footnote{\Rfunarg{output} can be set to either "minimal", "trace" or "all". See the documentation for an explanation of what these levels mean}; and specifying where to save the runs with \Rfunarg{rundir}. Execute \Rfunction{help(bgx)} in R for a full explanation of all the parameters. 
 
 As an example, let us analyse the \Robject{Dilution} data set and save the results in the current working directory ("."):
 
@@ -62,13 +62,13 @@ As an example, let us analyse the \Robject{Dilution} data set and save the resul
 library(affydata)
 library(hgu95av2cdf)
 data(Dilution)
-eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,genes=c(12500:12599), output="all", basepath=".")
+eset <- bgx(Dilution, samplesets=c(2,2), probeAff=FALSE, burnin=2048, iter=8192,genes=c(12500:12599), output="all")
 @
 
 The \Robject{eset} object will contain gene expression information for each gene under each condition (not necessarily each array). You may obtain the gene expression measure using the \Rfunction{exprs} function. For instance:
 
 <<>>=
-exprs(eset)[10:40,]
+exprs(eset)[10:40,] # Shorthand for assayData(eset)\$exprs[10:40,]
 @
 
 Run \Rfunction{help(ExpressionSet)} in R for more information.
@@ -109,14 +109,11 @@ You may then pass the \Robject{bgxOutput} object to any of several analysis func
 plotExpressionDensity(bgxOutput, gene=10)
 @
 
-In order to view a plot of ranked differential expression values and save these in a matrix, you could do:
-
-<<fig=TRUE>>=
-rankedGeneList <- plotDERank(bgxOutput)
-@
+In order to get a list of ranked differential expression values, you could do:
 
 <<echo=T>>=
-print(rankedGeneList[1:25,])
+rankedGeneList <- rankByDE(bgxOutput)
+print(rankedGeneList[1:25,]) # print top 25 DEG
 @
 
 Run \Rfunction{help(analysis.bgx)} for more detailed usage instructions on the analysis functions.

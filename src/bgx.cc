@@ -19,26 +19,7 @@
  *
  */
 
-#define BGXDEBUG 0
-
-#ifdef USING_R
-  extern "C" {
-  #include <R.h> // for flushing console
-  #include <R_ext/Utils.h> // we need to allow user interrupts from R
-  #include <R_ext/Print.h> // R for windows doesn't like cout or printf, need Rprintf
-  #if ( defined(HAVE_AQUA) || defined(WIN32) )
-    #define FLUSHCONSOLE {R_FlushConsole(); R_ProcessEvents();}
-  #else
-    #define FLUSHCONSOLE R_FlushConsole();
-  #endif
-   #ifdef WIN32
-    // Win32 GUI doesn't handle \r properly. Use \b's.
-    #define CLEARLINE "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-  #else
-    #define CLEARLINE "\r"
-  #endif
-  }
-#endif
+#define FULLTRACES 0
 
 #include "rand.hh"
 #include "rundir.hh"
@@ -53,9 +34,22 @@
 #include <time.h>
 #include "bgx.hh"
 
-#ifdef USING_R  /* Register routines, allocate resources. */
+#ifdef USING_R
+  extern "C" {
+  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #if ( defined(HAVE_AQUA) || defined(WIN32) )
+    #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
+  #else
+    #define FLUSH R_FlushConsole();
+  #endif
+  #ifdef WIN32 // Win32 GUI doesn't handle \r properly. Use \b's.
+    #define CARRIAGERETURN "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  #else
+    #define CARRIAGERETURN "\r"
+  #endif
+  #define PRINTF(...) Rprintf((char*) __VA_ARGS__)
+  /* Register routines, allocate resources. */
   #define R_NO_REMAP
-  extern "C"{
   #include <Rinternals.h>
   #include <R_ext/Rdynload.h>
   }
@@ -68,6 +62,10 @@
     R_registerRoutines(info, cMethods,NULL,NULL,NULL);
   }
   void R_unload_bgx(DllInfo *info) { } 
+#else
+  #define FLUSH fflush(stdout);
+  #define PRINTF(...) printf(__VA_ARGS__)
+  #define CARRIAGERETURN "\r"
 #endif
 
 using namespace std;
@@ -87,7 +85,7 @@ void stringcpy(char* p, const string& s) {
 } */
 
 
-// The following are global so that we can delete them in a separate function if there is a user interrupt in R
+// The following are global so that we can delete them in freeBGXMemory if there is a user interrupt in R
 static double *xave, *yave, *muave, *sacc, *hacc, *muacc, *sigmaacc, *lambdaacc, *etaacc;
 static ofstream *sigma_, *lambda_, *XS, *YS;
 static fstream *mu_;
@@ -106,9 +104,6 @@ static  Eta_T *AccEta;
 static  RWM<Eta_T> *Eta;
 static  Phi_T *Phi;
 static  Tau_T *Tau;
-
-//extern "C"
-//void freeBGXMemory(int *output, int *numberGenesToWatch);
 
 void bgx(double* pm, double* mm, int* samples, int* conditions, 
 	 int* probes, int* genes, int *numberCategories, int* numberGenesToWatch, int* samplesets, int* probesets,
@@ -159,24 +154,6 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   
   ofstream  muave_, xave_, yave_, sacc_, hacc_, muacc_, sigmaacc_, lambdaacc_, etaacc_,
     tau_, phi_,  eta_, unkcats_;
-
-  // Metropolis/Gibbs objects
-/*
-  S_T *AccS;
-  RWM<S_T,array2d> *S;
-  H_T *AccH;
-  RWM<H_T,array2d> *H;
-  Mu_T *AccMu;
-  RWM<Mu_T,array2d> *Mu;
-  Sigma_T *AccSigma;
-  RWM<Sigma_T,array2d> *Sigma;
-  Lambda_T *AccLambda;
-  RWM<Lambda_T,array2d> *Lambda;
-  Eta_T *AccEta;
-  RWM<Eta_T> *Eta;
-  Phi_T *Phi;
-  Tau_T *Tau;
-*/
 
   // Initialise "averages"
   muave = new double[*genes**conditions];
@@ -484,19 +461,11 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     empBayesEst_ << '\t'  << j << '\t'  <<  a[j] << '\t'  <<  b[j] << endl;
   }
   if(badSets.size()>1){
-#ifndef USING_R
-    printf("Warning: There were %d probe sets with PM<=MM for all probes.\n", (int)badSets.size());
-#else
-    Rprintf((char *)"Warning: There were %d probe sets with PM<=MM for all probes.\n", (int)badSets.size());
-#endif
+    PRINTF("Warning: There were %d probe sets with PM<=MM for all probes.\n", (int)badSets.size());
     empBayesEst_ << endl << "There were " << badSets.size() 
          << " probe sets with PM<=MM for all probes." << endl;
   } else if(badSets.size()==1){
-#ifndef USING_R
-    printf("Warning: There was %d probe set with PM<=MM for all probes.\n", (int)badSets.size());
-#else
-    Rprintf((char *)"Warning: There was %d probe set with PM<=MM for all probes.\n", (int)badSets.size());
-#endif
+    PRINTF("Warning: There was %d probe set with PM<=MM for all probes.\n", (int)badSets.size());
     empBayesEst_ << endl << "There was " << badSets.size() 
                  << " probe set with PM<=MM for all probes." << endl;
   }
@@ -586,8 +555,11 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   Tau = new Tau_T(tau,PM,MM,s,h,phi,beta,0.001,0.001,&rand);
 
-#if BGXDEBUG
-  ofstream fullMuTrace_((run_dir + "/fullMuTrace").c_str());
+  PRINTF("Starting MCMC simulation...\n");
+
+#if FULLTRACES
+  #warning "#FULLTRACES set to 1: outputting traces of both burn-in and sampling stages"
+  PRINTF("Warning: #FULLTRACES set to 1: outputting traces of both burn-in and sampling stages\n");
 #endif
 
   time_t start_time, end_time;
@@ -595,24 +567,65 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   // Run the Markov chain: Burn-in phase
   for(int sweep=0; sweep<*burnin; ++sweep){
-#ifndef USING_R
-    printf("Burn-in sweep %d of %d\r", sweep , *burnin);
-    if(sweep%16 == 0) fflush(stdout);
-#else
-    Rprintf((char *)"%sBurn-in sweep %d of %d", CLEARLINE, sweep , *burnin);
-    if(sweep%16 == 0) FLUSHCONSOLE
+    PRINTF("%sBurn-in sweep %d of %d", CARRIAGERETURN, sweep , *burnin);
+    if(sweep%16 == 0) FLUSH
+#ifdef USING_R
     R_CheckUserInterrupt();
 #endif
 
-#if BGXDEBUG
-  if(sweep%8 == 0) {
-    for(int c=0; c < *conditions; c++) {
-      for(int g=0; g < *genes; g+=40) {
-        fullMuTrace_ << mu[c][g] << " ";
+#if FULLTRACES // Output burn-in subsample traces too!
+    if(!(sweep%*subsample)){
+      for(int c=0; c<*conditions; ++c){
+        for(int g=0; g<*genes; ++g) {
+          mu_[c] << mu[c][g] << '\t';
+        }
+        mu_[c] << '\n';
       }
-      fullMuTrace_ << endl;
+
+      if(*output >= BGXTRACE){
+        for(int c=0; c<*conditions; ++c){
+          for(int g=0; g<*genes; ++g) {
+            sigma_[c] << 1.0/sigma[c][g] << '\t';
+          }
+          sigma_[c] << '\n';
+        }
+        
+        phi_ << phi << endl;
+
+        for(int sample=0; sample<*samples; ++sample){
+          tau_ << 1/tau[sample] << '\t';
+          eta_ << 1/eta[sample] << '\t';
+          for(int c=0; c<*numberCategories; ++c){
+            lambda_[sample] << lambda[sample][c] << '\t';
+           // etas_[sample] << 1.0/etas[sample][c] << '\t';
+          }
+          lambda_[sample] << '\n';
+         // etas_[sample] << '\n';
+        }
+        tau_ << '\n';
+     // lambda_ << '\n';
+        eta_ << '\n';
+
+        if(*numberOfUnknownProbeSeqs) {
+          for(int i=0; i < *numberOfUnknownProbeSeqs;i++) unkcats_ << categories[unknownProbeSeqs[i]] << '\t';
+          unkcats_ << endl;
+        }
+      }
+ 
+      if(*numberGenesToWatch>0) {
+        for(int sample=0; sample<*samples; ++sample){
+          for(int g=0; g<*numberGenesToWatch; g++){
+            for(int p=0; p<probesets[whichGenesToWatch[g]]; p++){
+              // output x and y
+              XS[sample] << log(s[sample][(whichProbesToWatch[g])+p]+1) << '\t';
+              YS[sample] << log(h[sample][(whichProbesToWatch[g])+p]+1) << '\t';
+            }
+          }
+          XS[sample] << '\n';
+          YS[sample] << '\n';
+        }
+      }
     }
-  }
 #endif
 
     if(*numberOfUnknownProbeSeqs) I.Update();
@@ -640,11 +653,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
     }
     
   }
-#ifndef USING_R
-  printf("%d burn-in sweeps completed.\n", *burnin);
-#else
-  Rprintf((char *)"%s%d burn-in sweeps completed.\n", CLEARLINE, *burnin);
-#endif
+  PRINTF("%s%d burn-in sweeps completed.\n", CARRIAGERETURN, *burnin);
 
   S->Reset();
   H->Reset();
@@ -658,24 +667,10 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   // Run the Markov chain: Sampling phase
   for(int sweep=0; sweep<*iter; ++sweep){
-#ifndef USING_R
-    printf("Sampling sweep %d of %d\r", sweep, *iter);
-    if(sweep%16 == 0) fflush(stdout);
-#else
-    Rprintf((char *)"%sSampling sweep %d of %d", CLEARLINE, sweep, *iter);
-    if(sweep%16 == 0) FLUSHCONSOLE
+    PRINTF("%sSampling sweep %d of %d\r", CARRIAGERETURN, sweep, *iter);
+    if(sweep%16 == 0) FLUSH
+#ifdef USING_R
     R_CheckUserInterrupt();
-#endif
-
-#if BGXDEBUG
-  if(sweep%8 == 0) {
-    for(int c=0; c < *conditions; c++) {
-      for(int g=0; g < *genes; g++) {
-        fullMuTrace_ << mu[c][g] << " ";
-      }
-      fullMuTrace_ << endl;
-    }
-  }
 #endif
 
     if(*numberOfUnknownProbeSeqs) I.Update();
@@ -765,8 +760,8 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
           for(int g=0; g<*numberGenesToWatch; g++){
             for(int p=0; p<probesets[whichGenesToWatch[g]]; p++){
               // output x and y
-              XS[sample] << log(s[sample][(whichProbesToWatch[g]-1)+p]+1) << '\t';
-              YS[sample] << log(h[sample][(whichProbesToWatch[g]-1)+p]+1) << '\t';
+              XS[sample] << log(s[sample][(whichProbesToWatch[g])+p]+1) << '\t';
+              YS[sample] << log(h[sample][(whichProbesToWatch[g])+p]+1) << '\t';
             }
           }
           XS[sample] << '\n';
@@ -780,21 +775,11 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   time(&end_time);
   int duration = (int)difftime(end_time,start_time);
 
-#ifndef USING_R
-  printf("%d sampling sweeps completed.\n", *iter);
-  printf("MCMC duration: %dh %dm %ds\n", duration/3600, duration%3600/60, duration%60);
-#else
-  Rprintf((char *)"%s%d sampling sweeps completed.\n", CLEARLINE, *iter);
-  Rprintf((char *)"MCMC duration: %dh %dm %ds\n", duration/3600, duration%3600/60, duration%60);
-#endif
+  PRINTF("%s%d sampling sweeps completed.\n", CARRIAGERETURN, *iter);
+  PRINTF("MCMC duration: %dh %dm %ds\n", duration/3600, duration%3600/60, duration%60);
 
   summary << "MCMC duration:\t" <<  duration/3600 << "h " << duration%3600/60 << "m " << duration%60 << "s\n";
   summary.close();
-
-#if BGXDEBUG
-  fullMuTrace_.close();
-#endif
-
 
   for(int c=0; c<*conditions; ++c){
     for(int g=0; g<*genes; ++g){
@@ -873,40 +858,44 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   }
 
   // IACT and MCSE
-  ofstream mcse_((run_dir + "/MCSE").c_str());
-  ofstream iact_((run_dir + "/IACT").c_str());
-  double * mcse = new double[*genes * *iter/(*subsample)];
+  ofstream mumcse_((run_dir + "/mumcse").c_str());
+  ofstream muiact_((run_dir + "/muiact").c_str());
+  double * mumcse = new double[*genes * *iter/(*subsample)];
   for(int c=0; c < *conditions; c++) {
     mu_[c].seekg(0, ios::beg);
     
     for(int i=0; i < *iter/(*subsample); i++) {
-      for(int g=0; g < *genes; g++) mu_[c] >> mcse[g**iter/(*subsample) + i];
+      for(int g=0; g < *genes; g++) mu_[c] >> mumcse[g**iter/(*subsample) + i];
     }
 
     for(int g=0; g < *genes; g++) {
       double var=0;
       double tau=0;
       int m=0;
-      if(sokal(*iter/(*subsample),&mcse[g**iter/(*subsample)],&var,&tau,&m)!=0) {
-        mcse_ << *iter/(*subsample) << " ";
-        iact_ << "NA" << " ";
+      int len=*iter/(*subsample);
+      if(sokal(&len,&mumcse[g**iter/(*subsample)],&var,&tau,&m)!=0) {
+        mumcse_ << *iter/(*subsample) << " ";
+        muiact_ << "NA" << " ";
       } else {
-        mcse_ << tau*var**subsample/(*iter) << " ";
-        iact_ << tau << " ";
+        mumcse_ << sqrt(tau*var**subsample/(*iter)) << " ";
+        muiact_ << tau << " ";
       }
     }
-    mcse_ << endl;
-    iact_ << endl;
+    mumcse_ << endl;
+    muiact_ << endl;
   }
-  mcse_.close();
-  iact_.close();
+  mumcse_.close();
+  muiact_.close();
   for(int c=0; c<*conditions; ++c) mu_[c].close();
-  delete [] mcse;
+  delete [] mumcse;
 
-  // In the parallel version, memory that is allocated by all nodes is deallocated here rather than above.
-  // We do the same here for code structure compatibility.
+  PRINTF("CEL files analysed: \t");
+  for(int s =0; s < *samples-1; s++) PRINTF("%s, ", sampleNames[s]);
+  PRINTF("%s\n",sampleNames[*samples-1]);
+  PRINTF("Results are in %s\n", *dirname);
+  PRINTF("Run finished.\n");
 
-#ifndef USING_R
+#ifndef USING_R // If using R, let R call this function, otherwise call here
   freeBGXMemory(output, numberGenesToWatch);
 #endif
 }

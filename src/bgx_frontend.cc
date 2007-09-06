@@ -314,8 +314,6 @@ int main(int argc, const char* argv[])
       &adaptive_, &batch_size, &optimalAR,
       &subsample, &output, &dirname, &basepath, &seed, &sampleNames[0], &affinityPlotFile, &geneNamesFile);
 
-  cout << "Results are in " << dirname << endl;
-
   delete[] samplesets;
   delete[] probesets;
   delete[] genesToWatch;
