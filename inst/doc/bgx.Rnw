@@ -22,7 +22,7 @@
 \author{Ernest Turro\\Imperial College London}
 \begin{document}
 \title{HowTo BGX}
-\date{April 25, 2007}
+\date{September 6, 2007}
 
 \maketitle
 \section{Introduction}
