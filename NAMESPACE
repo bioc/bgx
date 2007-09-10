@@ -1,5 +1,4 @@
 useDynLib(bgx)
-useDynLib(sokal)
 
 importFrom(gcrma, compute.affinities)
 export(bgx,standalone.bgx, readOutput.bgx, plotExpressionDensity, plotDEDensity, plotDEHistogram,rankByDE, plotDiffRank)
