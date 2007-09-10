@@ -56,6 +56,7 @@
   static const R_CMethodDef cMethods[] = {
     {"bgx", (DL_FUNC)&bgx, 34},
     {"freeBGXMemory", (DL_FUNC)&freeBGXMemory, 2},
+    {"sokal", (DL_FUNC)&sokal,5},
     {NULL, NULL, 0}
   };
   void R_init_bgx(DllInfo *info) {
