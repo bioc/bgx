@@ -6,11 +6,11 @@
   readOutput.bgx reads in output from BGX which can then be fed into BGX analysis functions.
 }
 \usage{
-  readOutput.bgx(path)
+  readOutput.bgx(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{path}{Path of the output directory}
+  \item{...}{Paths of BGX output directories. If you specify more than one path, then the runs will be combined such that each condition from each run is treated as a different different from all the others.}
 }
 \details{
   See \code{\link{bgx}} for more details.
