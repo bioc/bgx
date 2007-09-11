@@ -17,11 +17,12 @@
 
 
 ### Read in BGX output
-readOutput.bgx <- function(path) {
+
+readSingle.bgx <- function(path) { 
   cat("Reading '",path, "'\n", sep="")
   summary <- read.delim(file.path(path,"summary.txt"))
 
- for(i in 1:nrow(summary)) { cat("***", row.names(summary)[i], "\n   ", paste(summary[i,1]),"\n")}
+  for(i in 1:nrow(summary)) { cat("***", row.names(summary)[i], "\n   ", paste(summary[i,1]),"\n")}
   
   summary <- as.vector(summary[[1]])
   noOfConditions <- as.numeric(summary[[2]])
@@ -45,6 +46,38 @@ readOutput.bgx <- function(path) {
   return(list(mu=mu, muave=muave, geneNames=geneNames))
 }
 
+readOutput.bgx <- function(...) {
+  args <- list(...)
+  paths <- c()
+  for(i in 1:length(args)){
+    for(j in 1:length(args[[i]])){
+      paths <- append(paths,args[[i]][j])
+    }
+  }
+  if(length(paths) > 1){
+    cat("Combining the output from", paste(paths, collapse=", "),".\n\n")
+    geneNames <- NULL
+    for(path in paths){
+      gn <- scan(file.path(path, "geneNames.txt"), what="character")
+      geneNames <- cbind(geneNames,gn)
+    }
+    for(i in nrow(geneNames)){
+      if(any(geneNames[i,1] != geneNames[i,])) stop("Sorry, incompatible output directories: gene names do not match.\n")
+    }
+  }
+  res <- list()
+  for(path in paths){
+    out <- readSingle.bgx(path)
+    if(length(res) == 0) res <- out
+    else {
+      for(i in 1:ncol(out$muave)) res$mu[[length(res$mu)+1]] <- out$mu[[i]]
+      res$muave <- cbind(res$muave, out$muave)
+    }
+  }
+  return(res)
+}
+
+ 
 ### Plot densities of mu's under all conditions
 plotExpressionDensity <- function(bgxOutput, gene=NULL, normalize=c("none","mean","loess"), ...) {
   if(is.null(gene)) stop("Please specify a genes index/name.")
