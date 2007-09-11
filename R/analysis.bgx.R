@@ -20,8 +20,8 @@
 readOutput.bgx <- function(path) {
   cat("Reading '",path, "'\n", sep="")
   summary <- read.delim(file.path(path,"summary.txt"))
-  print(summary)
-  cat('\n')
+
+ for(i in 1:nrow(summary)) { cat("***", row.names(summary)[i], "\n   ", paste(summary[i,1]),"\n")}
   
   summary <- as.vector(summary[[1]])
   noOfConditions <- as.numeric(summary[[2]])
