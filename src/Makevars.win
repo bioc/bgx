@@ -6,6 +6,4 @@
 MACHINE = -march=i386
 PKG_CXXFLAGS= -DUSING_R $(MACHINE) -ffast-math -O3
 PKG_CFLAGS = $(PKG_CXXFLAGS)  -std=c99
-ifdef BOOSTLIB
-  PKG_CPPFLAGS = -I $(BOOSTLIB)
-endif
+PKG_CPPFLAGS = -I ../boostIncl

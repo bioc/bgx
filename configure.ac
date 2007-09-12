@@ -16,7 +16,7 @@
 
 
 # Initialise.
-AC_INIT([bgx], [1.1.4], [ernest.turro@ic.ac.uk])
+AC_INIT([bgx], [1.1.5], [ernest.turro@ic.ac.uk])
 AC_CONFIG_SRCDIR([src/bgx.cc])
 #AC_CONFIG_HEADERS([src/config.h])
 
@@ -67,7 +67,13 @@ done
 AC_CHECK_LIB(m, main)
 
 # Checks for Boost libraries.
-AX_BOOST([1.31.0], BGX_CPPFLAGS="$BOOST_CPPFLAGS")
+#AX_BOOST([1.31.0], BGX_CPPFLAGS="$BOOST_CPPFLAGS")
+if test \( -f ./boostIncl.tar.gz \) -a \( ! -d ./boostIncl \);
+  then
+    echo "Untarring Boost header files..."
+    tar -xzf  ./boostIncl.tar.gz
+fi;
+BGX_CPPFLAGS="-I ../boostIncl"
 
 # Checks for typedefs, structures, and compiler characteristics.
 #AC_HEADER_STDBOOL
