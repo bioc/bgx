@@ -1,6 +1,6 @@
 # This is for gcc+win32 users (http://mingw.org)
 
-#MACHINE = -march=i386
+MACHINE = -march=i486
 PKG_CXXFLAGS= -DUSING_R $(MACHINE) -ffast-math -O3
 PKG_CFLAGS = $(PKG_CXXFLAGS)  -std=c99
 PKG_CPPFLAGS = -I ../boostIncl
