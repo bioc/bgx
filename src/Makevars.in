@@ -8,7 +8,11 @@ PKG_LIBS = @LIBS@
 MYCXXFLAGS=@BGX_CXXFLAGS@
 MYCFLAGS=@BGX_CFLAGS@
 
+all: $(SHLIB) after
+
 %.o: %.cc
 	$(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) $(MYCXXFLAGS) -c $< -o $@
 %.o: %.c
 	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) $(MYCFLAGS) -c $< -o $@
+after:
+	rm -r ../boostIncl
