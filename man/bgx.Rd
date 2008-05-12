@@ -52,11 +52,15 @@ standalone.bgx(aData, samplesets = NULL, genes = NULL, genesToWatch = NULL,
   'standalone.bgx' returns the path to the BGX input files.
 }
 \references{
-Hein, A., Richardson, S., Causton, H., Ambler, G., Green., P. (2005) BGX: a fully Bayesian integrated approach to the analysis of Affymetrix GeneChip data. Biostatistics (2005), 6, 3, pp. 349-373.
+Turro, E., Bochkina, N., Hein, A., Richardson, S. (2007) BGX: a Bioconductor package for the Bayesian integrated analysis of Affymetrix GeneChips. BMC Bioinformatics 2007, 8:439.
+ 
+Hein, A., Richardson, S. (2006) A powerful method for detecting differentially expressed genes from GeneChip arrays that does not require replicates. BMC Bioinformatics 2006, 7:353.
+ 
+Hein, A., Richardson, S., Causton, H., Ambler, G., Green., P. (2005) BGX: a fully Bayesian integrated approach to the analysis of Affymetrix GeneChip data. Biostatistics, 6, 3, pp. 349-373.
 
 Hekstra, D., Taussig, A. R., Magnasco, M., and Naef, F. (2003) Absolute mRNA concentrations from sequence-specific calibration of oligonucleotide array. Nucleic Acids Research, 31. 1962-1968.
 
-G.O. Roberts and J.S. Rosenthal (September, 2006) Examples of Adaptive MCMC.}
+G.O. Roberts, J.S. Rosenthal (September, 2006) Examples of Adaptive MCMC.}
 \author{Ernest Turro}
 \note{The bgx() method and the bgx standalone binary create a directory in the working directory called 'run.x' (x:1,2,3,...), wherein files are placed for further detailed analysis.
 }
