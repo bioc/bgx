@@ -21,7 +21,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <vector>
+#include <cstdlib>
 #include "bgx.hh"
 
 using namespace std;
