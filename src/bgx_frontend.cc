@@ -21,7 +21,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <vector>
+#include <cstdlib>
 #include "bgx.hh"
 
 using namespace std;
@@ -171,7 +173,7 @@ int main(int argc, const char* argv[])
     exit(11);
   }
   if(iter==-1){
-    cerr << "Number of post burn-in sweeps not specified in input file" << endl;
+    cerr << "Number of sampling sweeps not specified in input file" << endl;
     exit(11);
   }
   if(burnin==-1){
