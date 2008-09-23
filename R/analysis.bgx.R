@@ -20,15 +20,16 @@
 
 readSingle.bgx <- function(path) { 
   cat("Reading '",path, "'\n", sep="")
-  summary <- read.delim(file.path(path,"summary.txt"))
+  summary <- read.delim(file.path(path,"summary.txt"), row.names=1)
 
   for(i in 1:nrow(summary)) { cat("***", row.names(summary)[i], "\n   ", paste(summary[i,1]),"\n")}
   
-  summary <- as.vector(summary[[1]])
-  noOfConditions <- as.numeric(summary[[2]])
-  noOfGenes <- as.numeric(summary[[4]])
-  subsample <- as.numeric(summary[[8]])
-  iter <- as.numeric(summary[[10]])
+#  summary <- as.vector(summary[[1]])
+  noOfConditions <- as.numeric(as.vector(summary["Number of conditions:",]))
+  noOfGenes <- as.numeric(as.vector(summary["Number of genes:",]))
+  subsample <- as.numeric(as.vector(summary["Subsampling interval:",]))
+  iter <- as.numeric(as.vector(summary["Number of sampling sweeps:",]))
+  if(is.na(iter)) iter <- as.numeric(as.vector(summary["Number of post burn-in sweeps:",])) # old terminology
   traceLength <- iter/subsample
   
   mu <- list() 
