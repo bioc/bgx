@@ -2,5 +2,5 @@
 if test \( -f ./boostIncl.tar.gz \) -a \( ! -d ./boostIncl \);
   then
     echo "Untarring Boost header files..."
-    tar -xzf  ./boostIncl.tar.gz
+    tar --no-same-owner -xzf  ./boostIncl.tar.gz
 fi;
