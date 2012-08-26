@@ -21,6 +21,8 @@
 #ifndef _BGX_UPDATES_HH
 #define _BGX_UPDATES_HH
 
+#include "pnorm.hh"
+#include "qnorm.h"
 #include "rwm.hh"
 #include <valarray>
 
@@ -29,8 +31,6 @@ typedef valarray<double> array;
 typedef valarray<valarray<double> > array2d;
 
 #define SAFE_EXP(a) exp(max(-500.0,min(0.0,a)))
-
-inline double pnorm(double x){ return .5+.5*erf(M_SQRT1_2*x); }
 
 class S_T{
 private:

@@ -33,6 +33,7 @@
 #include <vector>
 #include <time.h>
 #include "bgx.hh"
+#include "pnorm.hh"
 
 #ifdef USING_R
   extern "C" {

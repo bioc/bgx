@@ -30,7 +30,8 @@
 #endif
 
 #include <boost/random.hpp>
-
+#include "pnorm.hh"
+#include "qnorm.h"
 
 template<class GenType, typename RealType = double> class Rand;
 template<class EngineType, typename RealType = double> class Boost_Wrap;
