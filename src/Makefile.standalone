@@ -19,7 +19,7 @@ bgx.so : bgx.o rundir.o qnorm.o sokal.o
 clean : 
 	rm -f bgx.o rundir.o qnorm.o sokal.o bgx_frontend.o rand.o bgx bgx.so bgx.exe bgx.dll
 
-bgx.o: bgx.cc rand.hh rundir.hh qnorm.h sokal.hh bgx_updates.hh rwm.hh bgx.hh
+bgx.o: bgx.cc rand.hh rundir.hh qnorm.h sokal.hh bgx_updates.hh rwm.hh bgx.hh pnorm.hh
 rundir.o: rundir.cc rundir.hh
 sokal.o: sokal.cc sokal.hh
 bgx_frontend.o: bgx_frontend.cc bgx.hh
