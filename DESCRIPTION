@@ -1,8 +1,8 @@
 Package: bgx
 Title: Bayesian Gene eXpression
-Version: 1.25.0
+Version: 1.26.0
 Author: Ernest Turro, Graeme Ambler, Anne-Mette K Hein
-Maintainer: Ernest Turro <ernest.turro@ic.ac.uk>
+Maintainer: Ernest Turro <et341@cam.ac.uk>
 Description: Bayesian integrated analysis of Affymetrix GeneChips
 License: GPL-2
 Depends: R (>= 2.0.1), Biobase, affy (>= 1.5.0), gcrma (>= 2.4.1)

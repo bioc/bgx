@@ -26,6 +26,31 @@
 #include <cstdlib>
 #include "bgx.hh"
 
+#ifdef USING_R
+  extern "C" {
+  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #if ( defined(HAVE_AQUA) || defined(WIN32) )
+    #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
+  #else
+    #define FLUSH R_FlushConsole();
+  #endif
+  #ifdef WIN32 // Win32 GUI doesn't handle \r properly. Use \b's.
+    #define CARRIAGERETURN "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  #else
+    #define CARRIAGERETURN "\r"
+  #endif
+  #define PRINTFERR(...) Rprintf((char*) __VA_ARGS__)
+  /* Register routines, allocate resources. */
+  #define R_NO_REMAP
+  #include <Rinternals.h>
+  #include <R_ext/Rdynload.h>
+  }
+#else
+  #define FLUSH fflush(stdout);
+  #define PRINTFERR(...) fprintf(stderr, __VA_ARGS__)
+  #define CARRIAGERETURN "\r"
+#endif
+
 using namespace std;
 
 enum { MINIMAL, TRACE, ALL}; 
@@ -39,13 +64,13 @@ int main(int argc, const char* argv[])
   char *dirname, *basepath;
 
   if(argc<2){
-    cerr << "No input file specified" << endl;
-    exit(1);
+    PRINTFERR("No input file specified\n");
+    return 1;
   }
   ifstream infile(argv[1]);
   if(!infile){
-    cerr << "Cannot open input file" << endl;
-    exit(2);
+    PRINTFERR("Cannot open input file\n");
+    return 2;
   }
   
   samples = conditions = probes = genes = seed = iter = burnin = numberOfCategories = numberOfGenesToWatch = numberOfUnknownProbeSeqs 
@@ -103,115 +128,115 @@ int main(int argc, const char* argv[])
     else if(temp_str=="geneNamesFile") infile >> geneNamesFile;
     else if(temp_str[0]=='#') getline(infile,temp_str);
     else{
-        cerr << "Malformed input file at unrecognised token " << temp_str << endl;
-	      exit(3);
+        PRINTFERR("Malformed input file at unrecognised token %s\n", temp_str.c_str());
+	      return 3;
     }
   }
 
   if(samples==-1){
-    cerr << "Number of samples not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of samples not specified in input file\n");
+    return 11;
   }
   if(conditions==-1){
-    cerr << "Number of conditions not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of conditions not specified in input file\n");
+    return 11;
   }
   if(probes==-1){
-    cerr << "Number of probes not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of probes not specified in input file\n");
+    return 11;
   }
   if(genes==-1){
-    cerr << "Number of genes not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of genes not specified in input file\n");
+    return 11;
   }
   if(numberOfCategories==-1){
-    cerr << "Number of categories not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of categories not specified in input file\n");
+    return 11;
   }
   if(numberOfGenesToWatch==-1){
-    cerr << "Number of genes to watch not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of genes to watch not specified in input file\n");
+    return 11;
   }
   if(numberOfUnknownProbeSeqs==-1){
-    cerr << "Number of unknown probe sequences not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of unknown probe sequences not specified in input file\n");
+    return 11;
   }
   if(samplesets_file==""){
-    cerr << "SampleSets file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("SampleSets file not specified in input file\n");
+    return 11;
   }
   if(probesets_file==""){
-    cerr << "ProbeSets file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("ProbeSets file not specified in input file\n");
+    return 11;
   }
   if(categories_file==""){
-    cerr << "categories file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("categories file not specified in input file\n");
+    return 11;
   }
   if(unknownProbeSeqs_file==""){
-    cerr <<"unknown probe sequences file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("unknown probe sequences file not specified in input file\n");
+    return 11;
   }
   if(genesToWatch_file==""){
-    cerr << "genesToWatch file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("genesToWatch file not specified in input file\n");
+    return 11;
   }
   if(firstProbeInEachGeneToWatch_file==""){
-    cerr << "firstProbeInEachGeneToWatch file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("firstProbeInEachGeneToWatch file not specified in input file\n");
+    return 11;
   }
   if(PM_file==""){
-    cerr << "PM file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("PM file not specified in input file\n");
+    return 11;
   }
   if(MM_file==""){
-    cerr << "MM file not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("MM file not specified in input file\n");
+    return 11;
   }
   if(seed==-1){
-    cerr << "Random number seed not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Random number seed not specified in input file\n");
+    return 11;
   }
   if(iter==-1){
-    cerr << "Number of sampling sweeps not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of sampling sweeps not specified in input file\n");
+    return 11;
   }
   if(burnin==-1){
-    cerr << "Number of burn-in sweeps not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Number of burn-in sweeps not specified in input file\n");
+    return 11;
   }
   if(s_jmp==-1){
-    cerr << "Spread of jumps for RWM on S not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Spread of jumps for RWM on S not specified in input file\n");
+    return 11;
   }
   if(h_jmp==-1){
-    cerr << "Spread of jumps for RWM on H not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Spread of jumps for RWM on H not specified in input file\n");
+    return 11;
   }
   if(mu_jmp==-1){
-    cerr << "Spread of jumps for RWM on Mu not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Spread of jumps for RWM on Mu not specified in input file\n");
+    return 11;
   }
   if(tau_jmp==-1){
-    cerr << "Spread of jumps for RWM on Tau not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Spread of jumps for RWM on Tau not specified in input file\n");
+    return 11;
   }
   if(lambda_jmp==-1){
-    cerr << "Spread of jumps for RWM on Lambda not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Spread of jumps for RWM on Lambda not specified in input file\n");
+    return 11;
   }
   if(eta_jmp==-1){
-    cerr << "Spread of jumps for RWM on Eta not specified in input file" << endl;
-    exit(11);
+    PRINTFERR("Spread of jumps for RWM on Eta not specified in input file\n");
+    return 11;
   }
   if(adaptive==-1){
-    cerr << "You have not specified whether to use adaptive MCMC" << endl;
-    exit(11);
+    PRINTFERR("You have not specified whether to use adaptive MCMC\n");
+    return 11;
   }
   if(adaptive){
     if(batch_size==-1 || optimalAR==-1){
-      cerr << "You have not specified a batch size and/or optimal acceptance ratio" << endl;
-      exit(11);
+      PRINTFERR("You have not specified a batch size and/or optimal acceptance ratio\n");
+      return 11;
     }
   }
 
@@ -224,8 +249,8 @@ int main(int argc, const char* argv[])
   
   ifstream SampleSets(samplesets_file.c_str());
   if(SampleSets==NULL){
-    cerr << "Could not open the Sample Sets file" << endl;
-    exit(4);
+    PRINTFERR("Could not open the Sample Sets file\n");
+    return 4;
   }
   samplesets = new int[conditions];
   for(int i=0; i<conditions; ++i)
@@ -234,8 +259,8 @@ int main(int argc, const char* argv[])
 
   ifstream ProbeSets(probesets_file.c_str());
   if(ProbeSets==NULL){
-    cerr << "Could not open the Probe Sets file" << endl;
-    exit(5);
+    PRINTFERR("Could not open the Probe Sets file\n");
+    return 5;
   }
   probesets = new int[genes];
   for(int i=0; i<genes; ++i)
@@ -244,8 +269,8 @@ int main(int argc, const char* argv[])
 
   ifstream Categories(categories_file.c_str());
   if(Categories==NULL){
-    cerr << "Could not open the Categories file" << endl;
-    exit(5);
+    PRINTFERR("Could not open the Categories file\n");
+    return 5;
   }
   categories = new int[probes];
   for(int i=0; i < probes; i++)
@@ -254,8 +279,8 @@ int main(int argc, const char* argv[])
 
   ifstream UnknownProbeSeqs(unknownProbeSeqs_file.c_str());
   if(UnknownProbeSeqs==NULL){
-    cerr <<"Could not open the Unknown Probe Sequences fil" << endl;
-    exit(5);
+    PRINTFERR("Could not open the Unknown Probe Sequences fil\n");
+    return 5;
   }
   unknownProbeSeqs = new int[numberOfUnknownProbeSeqs];
   for(int i=0; i < numberOfUnknownProbeSeqs;i++)
@@ -264,8 +289,8 @@ int main(int argc, const char* argv[])
  
   ifstream GenesToWatch(genesToWatch_file.c_str());
   if(GenesToWatch==NULL){
-    cerr << "Could not open the Genes To Watch file" << endl;
-    exit(5);
+    PRINTFERR("Could not open the Genes To Watch file\n");
+    return 5;
   }
   genesToWatch = new int[numberOfGenesToWatch];
   for(int i=0; i<numberOfGenesToWatch; ++i)
@@ -274,8 +299,8 @@ int main(int argc, const char* argv[])
 
   ifstream FirstProbeInEachGeneToWatch(firstProbeInEachGeneToWatch_file.c_str());
   if(FirstProbeInEachGeneToWatch==NULL){
-    cerr << "Could not open the Probe Sets To Watch file" << endl;
-    exit(5);
+    PRINTFERR("Could not open the Probe Sets To Watch file\n");
+    return 5;
   }
   firstProbeInEachGeneToWatch = new int[numberOfGenesToWatch];
   for(int i=0; i<numberOfGenesToWatch; ++i)
@@ -284,13 +309,13 @@ int main(int argc, const char* argv[])
  
   ifstream PM(PM_file.c_str());
   if(PM==NULL){
-    cerr << "Could not open the PM file" << endl;
-    exit(6);
+    PRINTFERR("Could not open the PM file\n");
+    return 6;
   }
   ifstream MM(MM_file.c_str());
   if(MM==NULL){
-    cerr << "Could not open the MM file" << endl;
-    exit(7);
+    PRINTFERR("Could not open the MM file\n");
+    return 7;
   }
   pm = new double[probes*samples];
   mm = new double[probes*samples];

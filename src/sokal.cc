@@ -24,6 +24,31 @@
 
 #include "sokal.hh"
 
+#ifdef USING_R
+  extern "C" {
+  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #if ( defined(HAVE_AQUA) || defined(WIN32) )
+    #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
+  #else
+    #define FLUSH R_FlushConsole();
+  #endif
+  #ifdef WIN32 // Win32 GUI doesn't handle \r properly. Use \b's.
+    #define CARRIAGERETURN "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  #else
+    #define CARRIAGERETURN "\r"
+  #endif
+  #define PRINTFERR(...) Rprintf((char*) __VA_ARGS__)
+  /* Register routines, allocate resources. */
+  #define R_NO_REMAP
+  #include <Rinternals.h>
+  #include <R_ext/Rdynload.h>
+  }
+#else
+  #define FLUSH fflush(stdout);
+  #define PRINTFERR(...) fprintf(stderr, __VA_ARGS__)
+  #define CARRIAGERETURN "\r"
+#endif
+
 int fft(double* xreal, double* ximag, int length);
 
 // Estimate integrated autocorrelation time using the method of Sokal.
@@ -36,7 +61,7 @@ int sokal(int *n_, double *x, double *var, double *tau, int* m)
   int n=*n_;
   if(n>2<<20)
     {
-      std::cerr << "Auto-correlation length exceeded" << std::endl;
+      PRINTFERR("Auto-correlation length exceeded\n");
       return 100;
     }
 
@@ -107,7 +132,7 @@ int fft(double* xreal, double* ximag, int length)
   n = length<0 ? -length : length;
 
   if(n<4){
-    std::cerr << "Fast Fourier length too short" << std::endl;
+    PRINTFERR("Fast Fourier length too short\n");
     return 200;
   }
   
@@ -120,7 +145,7 @@ int fft(double* xreal, double* ximag, int length)
   test=n;
   while(test>1){
     if(test&1){
-      std::cerr << "Fast Fourier length must be power of 2" << std::endl;
+      PRINTFERR("Fast Fourier length must be power of 2\n");
       return 201;
     }
     test>>=1;
@@ -223,7 +248,7 @@ int fft(double* xreal, double* ximag, int length)
   }
 
   if(time>20){
-    std::cerr << "Fast Fourier length too long" << std::endl;
+    PRINTFERR("Fast Fourier length too long\n");
     return 202;
   }
 

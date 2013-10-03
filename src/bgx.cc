@@ -21,6 +21,7 @@
 
 #define FULLTRACES 0
 
+#include <fstream>
 #include "rand.hh"
 #include "rundir.hh"
 #include "qnorm.h"
@@ -28,7 +29,6 @@
 #include "bgx_updates.hh"
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <valarray>
 #include <vector>
 #include <time.h>

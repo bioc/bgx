@@ -33,6 +33,31 @@
 #include "pnorm.hh"
 #include "qnorm.h"
 
+#ifdef USING_R
+  extern "C" {
+  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #if ( defined(HAVE_AQUA) || defined(WIN32) )
+    #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
+  #else
+    #define FLUSH R_FlushConsole();
+  #endif
+  #ifdef WIN32 // Win32 GUI doesn't handle \r properly. Use \b's.
+    #define CARRIAGERETURN "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+  #else
+    #define CARRIAGERETURN "\r"
+  #endif
+  #define PRINTFERR(...) Rprintf((char*) __VA_ARGS__)
+  /* Register routines, allocate resources. */
+  #define R_NO_REMAP
+  #include <Rinternals.h>
+  #include <R_ext/Rdynload.h>
+  }
+#else
+  #define FLUSH fflush(stdout);
+  #define PRINTFERR(...) fprintf(stderr, __VA_ARGS__)
+  #define CARRIAGERETURN "\r"
+#endif
+
 template<class GenType, typename RealType = double> class Rand;
 template<class EngineType, typename RealType = double> class Boost_Wrap;
 typedef Rand<Boost_Wrap<boost::lagged_fibonacci4423> > Random;
@@ -117,10 +142,14 @@ public:
     for(int i=0; i < n-1; i++) {
       if(u > cum[i] && u <= cum[i+1]) return x[i+1];
     }
-    std::cerr << "invalid cumulative distribution. rand.hh:120\n";
-    for(int i=0; i < n; i++ ) std::cerr << cum[i] << " ";
-    std::cerr << std::endl;
+    PRINTFERR("invalid cumulative distribution. rand.hh:120\n");
+    for(int i=0; i < n; i++ ) PRINTFERR("%f ", cum[i]);
+    PRINTFERR("\n");
+#ifdef USING_R
+    return -1;
+#else
     exit(1);
+#endif
   }
   // end Ernest's addition
   
