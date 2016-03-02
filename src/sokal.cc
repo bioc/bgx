@@ -26,6 +26,7 @@
 
 #ifdef USING_R
   extern "C" {
+  #define NO_C_HEADERS
   #include <R.h> // for flushing console, allowing user interrupts, and printing to console
   #if ( defined(HAVE_AQUA) || defined(WIN32) )
     #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
