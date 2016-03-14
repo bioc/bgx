@@ -25,9 +25,11 @@
 #include "sokal.hh"
 
 #ifdef USING_R
+  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #include <Rinternals.h>
+  #include <R_ext/Rdynload.h>
   extern "C" {
   #define NO_C_HEADERS
-  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
   #if ( defined(HAVE_AQUA) || defined(WIN32) )
     #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
   #else
@@ -41,8 +43,6 @@
   #define PRINTFERR(...) Rprintf((char*) __VA_ARGS__)
   /* Register routines, allocate resources. */
   #define R_NO_REMAP
-  #include <Rinternals.h>
-  #include <R_ext/Rdynload.h>
   }
 #else
   #define FLUSH fflush(stdout);
