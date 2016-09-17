@@ -29,7 +29,6 @@
   #include <Rinternals.h>
   #include <R_ext/Rdynload.h>
   extern "C" {
-  #define NO_C_HEADERS
   #if ( defined(HAVE_AQUA) || defined(WIN32) )
     #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
   #else
