@@ -27,21 +27,21 @@
 #include <valarray>
 
 using namespace std; 
-typedef valarray<double> array;
-typedef valarray<valarray<double> > array2d;
+typedef valarray<double> varray;
+typedef valarray<valarray<double> > varray2d;
 
 #define SAFE_EXP(a) exp(max(-500.0,min(0.0,a)))
 
 class S_T{
 private:
-  array2d& PM;
-  array2d& MM;
-  array2d& H;
+  varray2d& PM;
+  varray2d& MM;
+  varray2d& H;
   double &phi;
-  array2d& mu;
-  array2d& taug;
-  array& tau;
-  array& beta;
+  varray2d& mu;
+  varray2d& taug;
+  varray& tau;
+  varray& beta;
   int* probesets;
   int* samplesets;
   int* categories;
@@ -50,13 +50,13 @@ private:
   int c;
   int r;
 public:
-  S_T(array2d& PM_, array2d& MM_, array2d& H_, double &phi_, array2d& mu_, 
-      array2d& taug_, array& tau_, array& beta_, int* probesets_,
+  S_T(varray2d& PM_, varray2d& MM_, varray2d& H_, double &phi_, varray2d& mu_, 
+      varray2d& taug_, varray& tau_, varray& beta_, int* probesets_,
       int* samplesets_, int * categories_)
     : PM(PM_), MM(MM_), H(H_), phi(phi_), mu(mu_), taug(taug_), 
       tau(tau_), beta(beta_), probesets(probesets_), samplesets(samplesets_), categories(categories_) {}
 
-  double operator()(array2d& S, double S2, int j, int i)
+  double operator()(varray2d& S, double S2, int j, int i)
   {
     if(i==0){
       g=p=0;
@@ -81,23 +81,23 @@ public:
 
 class H_T{
 private:
-  array2d& PM;
-  array2d& MM;
-  array2d& S;
+  varray2d& PM;
+  varray2d& MM;
+  varray2d& S;
   double &phi;
-  array2d& lambdas;
-  //array2d& etas;
-  array& eta;
-  array& tau;
-  array& beta;
+  varray2d& lambdas;
+  //varray2d& etas;
+  varray& eta;
+  varray& tau;
+  varray& beta;
   int * categories; 
 public:
-  H_T(array2d& PM_, array2d& MM_, array2d& S_, double &phi_, array2d& lambdas_,
-      array& eta_, array& tau_, array& beta_, int *categories_)
+  H_T(varray2d& PM_, varray2d& MM_, varray2d& S_, double &phi_, varray2d& lambdas_,
+      varray& eta_, varray& tau_, varray& beta_, int *categories_)
     : PM(PM_), MM(MM_), S(S_), phi(phi_), lambdas(lambdas_), eta(eta_), 
       tau(tau_), beta(beta_), categories(categories_) {}
   
-  double operator()(array2d& H, double H2, int j, int i)
+  double operator()(varray2d& H, double H2, int j, int i)
   { 
     if(H2>0)
       {
@@ -117,17 +117,17 @@ public:
 
 class Mu_T{
 private:
-  array2d& S;
-  array2d& taug;
+  varray2d& S;
+  varray2d& taug;
   int* probesets;
   int* samplesets;
   int offset;
   int offset2;
 public:
-  Mu_T(array2d& S_, array2d& taug_, int* probesets_, int* samplesets_)
+  Mu_T(varray2d& S_, varray2d& taug_, int* probesets_, int* samplesets_)
     : S(S_), taug(taug_), probesets(probesets_), samplesets(samplesets_) {}
 
-  double operator()(array2d& mu, double mu2, int k, int i)
+  double operator()(varray2d& mu, double mu2, int k, int i)
   {
     if(i==0){
       offset=0;
@@ -156,19 +156,19 @@ public:
 
 class Sigma_T{
 private:
-  array2d& S;
-  array2d& mu;
-  array& a;
-  array& b;
+  varray2d& S;
+  varray2d& mu;
+  varray& a;
+  varray& b;
   int* probesets;
   int* samplesets;
   int offset;
   int offset2;
 public:
-  Sigma_T(array2d& S_, array2d& mu_, array& a_, array& b_, int* probesets_, int* samplesets_)
+  Sigma_T(varray2d& S_, varray2d& mu_, varray& a_, varray& b_, int* probesets_, int* samplesets_)
     : S(S_), mu(mu_), a(a_), b(b_), probesets(probesets_), samplesets(samplesets_) {}
 
-  double operator()(array2d& taug, double taug2, int k, int i)
+  double operator()(varray2d& taug, double taug2, int k, int i)
   {
     if(i==0){
       offset=0;
@@ -202,18 +202,18 @@ public:
 
 class Lambda_T{
 private:
-  array2d& H;
-  //array2d& etas;
-  array& eta;
+  varray2d& H;
+  //varray2d& etas;
+  varray& eta;
   double p_mu;
   double p_tau;
   int probes;
   vector<vector<int> > &cat_indices;
 public:
-  Lambda_T(array2d& H_, array& eta_, double p_mu_, double p_tau_, vector<vector<int> > & cat_indices_)
+  Lambda_T(varray2d& H_, varray& eta_, double p_mu_, double p_tau_, vector<vector<int> > & cat_indices_)
     : H(H_), eta(eta_), p_mu(p_mu_), p_tau(p_tau_), probes(H[0].size()),cat_indices(cat_indices_){}
   
-  double operator()(array2d& lambda, double lambda2, int j, int cat) //j == samples
+  double operator()(varray2d& lambda, double lambda2, int j, int cat) //j == samples
   {
     double sum=0;
     for(unsigned int i=0; i < cat_indices[cat].size(); ++i)
@@ -232,8 +232,8 @@ public:
 
 class Eta_T{
 private:
-  array2d& H;
-  array2d& lambdas;
+  varray2d& H;
+  varray2d& lambdas;
   double alpha;
   double beta;
   int probes;
@@ -241,12 +241,12 @@ private:
   int *categories;
   int noOfCategories;
 public:
-  Eta_T(array2d& H_, array2d& lambdas_, double alpha_, double beta_, vector<vector<int> > &cat_indices_,int *categories_)
+  Eta_T(varray2d& H_, varray2d& lambdas_, double alpha_, double beta_, vector<vector<int> > &cat_indices_,int *categories_)
     : H(H_), lambdas(lambdas_), alpha(alpha_), beta(beta_), probes(H[0].size()), cat_indices(cat_indices_), 
     categories(categories_),noOfCategories(lambdas[0].size()){}
 
   
-double operator()(array & eta, double eta2, int j/*, int cat*/)
+double operator()(varray & eta, double eta2, int j/*, int cat*/)
   {
     double sum=0.0;
     for(int i=0;i < probes; ++i) {
@@ -265,7 +265,7 @@ double operator()(array & eta, double eta2, int j/*, int cat*/)
 
 class Kappa_T{
 private:
-  array2d& lambdas;
+  varray2d& lambdas;
   double alpha;
   double beta;
   int probes;
@@ -273,11 +273,11 @@ private:
   int noOfCategories;
   int *categories;
 public:
-  Kappa_T(array2d& lambdas_, double alpha_, double beta_, int probes_, vector<vector<int> > &cat_indices_,int *categories_)
+  Kappa_T(varray2d& lambdas_, double alpha_, double beta_, int probes_, vector<vector<int> > &cat_indices_,int *categories_)
     :lambdas(lambdas_), alpha(alpha_), beta(beta_), probes(probes_), cat_indices(cat_indices_),
     noOfCategories(lambdas[0].size()),categories(categories_) {}
 
-  double operator()(array & kappa, double kappa2, int j/*, int cat*/)
+  double operator()(varray & kappa, double kappa2, int j/*, int cat*/)
   {
     double lam = 0.0;
     for(int i=0; i < noOfCategories; i++) {
@@ -299,18 +299,18 @@ public:
 class Phi_T{
 private:
   double &phi;
-  array2d& MM;
-  array2d& S;
-  array2d& H;
-  array& tau;
-  array& beta;
+  varray2d& MM;
+  varray2d& S;
+  varray2d& H;
+  varray& tau;
+  varray& beta;
   Random* rand;
   int probes;
   int samples;
   int *categories;
   int numberCategories;
 public:
-  Phi_T(double &phi_, array2d& MM_, array2d& S_, array2d& H_, array& tau_, array& beta_,
+  Phi_T(double &phi_, varray2d& MM_, varray2d& S_, varray2d& H_, varray& tau_, varray& beta_,
 	Random* rand_, int *categories_, int numberCategories_)
     : phi(phi_), MM(MM_), S(S_), H(H_), tau(tau_), beta(beta_), rand(rand_), probes(MM[0].size()), samples(MM.size()),
       categories(categories_), numberCategories(numberCategories_) {}
@@ -335,21 +335,21 @@ public:
 
 class Tau_T{
 private:
-  array& tau;
-  array2d& PM;
-  array2d& MM;
-  array2d& S;
-  array2d& H;
+  varray& tau;
+  varray2d& PM;
+  varray2d& MM;
+  varray2d& S;
+  varray2d& H;
   double &phi;
-  array& beta;
+  varray& beta;
   double alpha;
   double p_beta;
   Random* rand;
   int probes;
   int samples;
 public:
-  Tau_T(array& tau_, array2d& PM_, array2d& MM_, array2d& S_, array2d& H_, 
-	double &phi_, array& beta_, double alpha_, double p_beta_, Random* rand_)
+  Tau_T(varray& tau_, varray2d& PM_, varray2d& MM_, varray2d& S_, varray2d& H_, 
+	double &phi_, varray& beta_, double alpha_, double p_beta_, Random* rand_)
     : tau(tau_), PM(PM_), MM(MM_), S(S_), H(H_), phi(phi_), beta(beta_), alpha(alpha_), 
       p_beta(p_beta_), rand(rand_), probes(PM[0].size()), samples(PM.size()) {}
 
@@ -371,16 +371,16 @@ public:
 /* not in use - fixed by Emp Bayes like procedure
 class A_T{
 private:
-  array& a;
-  array2d& taug;
-  array& b;
+  varray& a;
+  varray2d& taug;
+  varray& b;
   double p_mu;
   double p_tau;
   Random* rand;
   int genes;
   int conditions;
 public:
-  A_T(array& a_, array2d& taug_, array& b_,
+  A_T(varray& a_, varray2d& taug_, varray& b_,
       double p_mu_, double p_tau_, Random* rand_)
     : a(a_), taug(taug_), b(b_),
       p_mu(p_mu_), p_tau(p_tau_), rand(rand_), genes(taug[0].size()), conditions(taug.size()) {}
@@ -402,16 +402,16 @@ public:
 
 class B_T{
 private:
-  array& b;
-  array2d& taug;
-  array& a;
+  varray& b;
+  varray2d& taug;
+  varray& a;
   double alpha;
   double beta;
   Random* rand;
   int genes;
   int conditions;
 public:
-  B_T(array& b_, array2d& taug_, array& a_,
+  B_T(varray& b_, varray2d& taug_, varray& a_,
       double alpha_, double beta_, Random* rand_)
     : b(b_), taug(taug_), a(a_),
       alpha(alpha_), beta(beta_), rand(rand_), genes(taug[0].size()), conditions(taug.size()) {}
@@ -432,21 +432,21 @@ public:
 
 class Beta_T{
 private:
-  array& beta;
-  array2d& PM;
-  array2d& MM;
-  array2d& S;
-  array2d& H;
+  varray& beta;
+  varray2d& PM;
+  varray2d& MM;
+  varray2d& S;
+  varray2d& H;
   double& phi;
-  array& tau;
+  varray& tau;
   double mu;
   double sigma;
   Random* rand;
   int probes;
   int samples;
 public:
-  Beta_T(array& beta_, array2d& PM_, array2d& MM_, array2d& S_, array2d& H_,
-      double& phi_, array& tau_, double mu_, double sigma_, Random* rand_)
+  Beta_T(varray& beta_, varray2d& PM_, varray2d& MM_, varray2d& S_, varray2d& H_,
+      double& phi_, varray& tau_, double mu_, double sigma_, Random* rand_)
     : beta(beta_), PM(PM_),  MM(MM_), S(S_), H(H_), phi(phi_), tau(tau_),
       mu(mu_), sigma(sigma_), rand(rand_), probes(PM[0].size()), samples(PM.size()) {}
 
@@ -477,14 +477,14 @@ class MissingProbeSeqs {
   double *gammas;
   double *discreteSamplingDistribution;
   double *cumulativeDiscreteSamplingDistribution;
-  array2d& H; 
-  array2d& lambdas;
-  array& eta;
+  varray2d& H; 
+  varray2d& lambdas;
+  varray& eta;
   Random* rand;
 
   public:
   MissingProbeSeqs(int *categories_, int numberOfCategories_,int probes_, int samples_,
-    int *unknownSeqProbePos_, int numberOfUnknownSeqs_, array2d& H_, array2d& lambdas_, array& eta_,
+    int *unknownSeqProbePos_, int numberOfUnknownSeqs_, varray2d& H_, varray2d& lambdas_, varray& eta_,
     Random* rand_) :
     categories(categories_), numberOfCategories(numberOfCategories_), probes(probes_),samples(samples_),
     unknownSeqProbePos(unknownSeqProbePos_),numberOfUnknownSeqs(numberOfUnknownSeqs_),
