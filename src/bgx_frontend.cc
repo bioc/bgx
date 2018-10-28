@@ -248,7 +248,7 @@ int main(int argc, const char* argv[])
   }
   
   ifstream SampleSets(samplesets_file.c_str());
-  if(SampleSets==NULL){
+  if(!SampleSets.good()){
     PRINTFERR("Could not open the Sample Sets file\n");
     return 4;
   }
@@ -258,7 +258,7 @@ int main(int argc, const char* argv[])
   SampleSets.close();
 
   ifstream ProbeSets(probesets_file.c_str());
-  if(ProbeSets==NULL){
+  if(!ProbeSets.good()){
     PRINTFERR("Could not open the Probe Sets file\n");
     return 5;
   }
@@ -268,7 +268,7 @@ int main(int argc, const char* argv[])
   ProbeSets.close();
 
   ifstream Categories(categories_file.c_str());
-  if(Categories==NULL){
+  if(!Categories.good()){
     PRINTFERR("Could not open the Categories file\n");
     return 5;
   }
@@ -278,7 +278,7 @@ int main(int argc, const char* argv[])
   Categories.close();
 
   ifstream UnknownProbeSeqs(unknownProbeSeqs_file.c_str());
-  if(UnknownProbeSeqs==NULL){
+  if(!UnknownProbeSeqs.good()){
     PRINTFERR("Could not open the Unknown Probe Sequences fil\n");
     return 5;
   }
@@ -288,7 +288,7 @@ int main(int argc, const char* argv[])
   UnknownProbeSeqs.close();
  
   ifstream GenesToWatch(genesToWatch_file.c_str());
-  if(GenesToWatch==NULL){
+  if(!GenesToWatch.good()){
     PRINTFERR("Could not open the Genes To Watch file\n");
     return 5;
   }
@@ -298,7 +298,7 @@ int main(int argc, const char* argv[])
   GenesToWatch.close();
 
   ifstream FirstProbeInEachGeneToWatch(firstProbeInEachGeneToWatch_file.c_str());
-  if(FirstProbeInEachGeneToWatch==NULL){
+  if(!FirstProbeInEachGeneToWatch.good()){
     PRINTFERR("Could not open the Probe Sets To Watch file\n");
     return 5;
   }
@@ -308,12 +308,12 @@ int main(int argc, const char* argv[])
   FirstProbeInEachGeneToWatch.close();
  
   ifstream PM(PM_file.c_str());
-  if(PM==NULL){
+  if(!PM.good()){
     PRINTFERR("Could not open the PM file\n");
     return 6;
   }
   ifstream MM(MM_file.c_str());
-  if(MM==NULL){
+  if(!MM.good()){
     PRINTFERR("Could not open the MM file\n");
     return 7;
   }

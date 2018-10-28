@@ -37,7 +37,7 @@
 
 #ifdef USING_R
   extern "C" {
-  #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #include <Rcpp.h> // for flushing console, allowing user interrupts, and printing to console
   #if ( defined(HAVE_AQUA) || defined(WIN32) )
     #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
   #else
@@ -74,8 +74,8 @@ using namespace std;
 
 enum { MINIMAL, BGXTRACE, ALL};
 
-typedef valarray<double> varray;
-typedef valarray<valarray<double> > varray2d;
+typedef valarray<double> array;
+typedef valarray<valarray<double> > array2d;
 
 void stringcpy(char* p, const string& s) {
   s.copy(p,string::npos);
@@ -93,15 +93,15 @@ static ofstream *sigma_, *lambda_, *XS, *YS;
 static fstream *mu_;
   // Metropolis/Gibbs objects
 static  S_T *AccS;
-static  RWM<S_T,varray2d> *S;
+static  RWM<S_T,array2d> *S;
 static  H_T *AccH;
-static  RWM<H_T,varray2d> *H;
+static  RWM<H_T,array2d> *H;
 static  Mu_T *AccMu;
-static  RWM<Mu_T,varray2d> *Mu;
+static  RWM<Mu_T,array2d> *Mu;
 static  Sigma_T *AccSigma;
-static  RWM<Sigma_T,varray2d> *Sigma;
+static  RWM<Sigma_T,array2d> *Sigma;
 static  Lambda_T *AccLambda;
-static  RWM<Lambda_T,varray2d> *Lambda;
+static  RWM<Lambda_T,array2d> *Lambda;
 static  Eta_T *AccEta;
 static  RWM<Eta_T> *Eta;
 static  Phi_T *Phi;
@@ -118,7 +118,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   // SETUP. declaration/initialisation of some variables up here for common code structure with parallel BGX
   string run_dir;
 
-  varray2d s(*samples),h(*samples),PM(*samples),MM(*samples), lambda(*samples),
+  array2d s(*samples),h(*samples),PM(*samples),MM(*samples), lambda(*samples),
     mu(*conditions),sigma(*conditions), s_jmps(*samples), h_jmps(*samples), 
     mu_jmps(*conditions), sigma_jmps(*conditions), lambda_jmps(*samples);
 
@@ -149,7 +149,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   }
 
   // Throughout the code we use eta, b, sigma  to refer to eta^{-2}, b^{-2}, sigma^{-2}
-  varray tau(*samples), beta(*samples), eta(*samples), eta_jmps(*samples), a(*conditions), b(*conditions);
+  array tau(*samples), beta(*samples), eta(*samples), eta_jmps(*samples), a(*conditions), b(*conditions);
   for(int j=0; j < *samples; j++) eta_jmps[j] = *eta_jmp;
 
   double phi;
@@ -359,7 +359,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
   // AMs addition: Obtaining Empirical Bayes like
   // estiamtes of a and b^2:
 
-  varray2d *ebS = new varray2d(*samples);
+  array2d *ebS = new array2d(*samples);
   // setting empirical Bayes values of signals: (*ebS)
   vector<pair<int,int> > badSets; // probe sets which have PM<=MM for all probes
 
@@ -401,7 +401,7 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   bool badData = false;
   {
-    varray2d vars(*conditions);
+    array2d vars(*conditions);
     int sampleCounter = 0;
     for(int j=0; j<*conditions; ++j){
       vars[j].resize(*genes);
@@ -531,24 +531,24 @@ void bgx(double* pm, double* mm, int* samples, int* conditions,
 
   // Initialise the update objects. For random walk Metropolis (RWM) steps, this 
   // involves creating an acceptance probability functor (e.g. S_T AccS(...)) 
-  // and a RWM object (e.g. RWM<S_T,varray2d> S(...)). For Gibbs moves we just
+  // and a RWM object (e.g. RWM<S_T,array2d> S(...)). For Gibbs moves we just
   // create a single update object (e.g. A_T A(...)).
   // These are all defined in bgx_updates.hh.
 
   AccS = new S_T(PM,MM,h,phi,mu,sigma,tau,beta,probesets,samplesets,categories );
-  S = new RWM<S_T,varray2d>(s,*AccS,s_jmps,*batch_size,*optimalAR,*s_jmp,&rand);
+  S = new RWM<S_T,array2d>(s,*AccS,s_jmps,*batch_size,*optimalAR,*s_jmp,&rand);
 
   AccH = new H_T(PM,MM,s,phi,lambda,eta,tau,beta,categories);
-  H = new RWM<H_T,varray2d>(h,*AccH,h_jmps,*batch_size,*optimalAR, *h_jmp, &rand);
+  H = new RWM<H_T,array2d>(h,*AccH,h_jmps,*batch_size,*optimalAR, *h_jmp, &rand);
 
   AccMu = new Mu_T(s,sigma,probesets,samplesets);
-  Mu = new RWM<Mu_T,varray2d>(mu,*AccMu,mu_jmps,*batch_size,*optimalAR,*mu_jmp,&rand);
+  Mu = new RWM<Mu_T,array2d>(mu,*AccMu,mu_jmps,*batch_size,*optimalAR,*mu_jmp,&rand);
 
   AccSigma = new Sigma_T(s,mu,a,b,probesets,samplesets);
-  Sigma = new RWM<Sigma_T,varray2d>(sigma,*AccSigma,sigma_jmps,*batch_size,*optimalAR,*sigma_jmp,&rand);
+  Sigma = new RWM<Sigma_T,array2d>(sigma,*AccSigma,sigma_jmps,*batch_size,*optimalAR,*sigma_jmp,&rand);
 
   AccLambda = new Lambda_T(h,eta,0,0.001, cat_indices);
-  Lambda = new RWM<Lambda_T,varray2d>(lambda,*AccLambda,lambda_jmps,*batch_size,*optimalAR,*lambda_jmp,&rand);
+  Lambda = new RWM<Lambda_T,array2d>(lambda,*AccLambda,lambda_jmps,*batch_size,*optimalAR,*lambda_jmp,&rand);
 
   AccEta = new Eta_T(h,lambda,0.001,0.001,cat_indices,categories);
   Eta = new RWM<Eta_T>(eta,*AccEta,eta_jmps,*batch_size,*optimalAR,*eta_jmp,&rand);
