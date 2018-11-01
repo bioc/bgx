@@ -36,8 +36,8 @@
 #include "pnorm.hh"
 
 #ifdef USING_R
-  extern "C" {
   #include <Rcpp.h> // for flushing console, allowing user interrupts, and printing to console
+  extern "C" {
   #if ( defined(HAVE_AQUA) || defined(WIN32) )
     #define FLUSH {R_FlushConsole(); R_ProcessEvents();}
   #else
