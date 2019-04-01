@@ -27,6 +27,7 @@
 
 #ifdef USING_R
   #include <R.h> // for flushing console, allowing user interrupts, and printing to console
+  #include <Rcpp.h>
   #include <Rinternals.h>
   #include <R_ext/Rdynload.h>
   extern "C" {

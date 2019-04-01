@@ -21,7 +21,6 @@
 
 #define FULLTRACES 0
 
-#include <fstream>
 #include "rand.hh"
 #include "rundir.hh"
 #include "qnorm.h"
@@ -69,6 +68,7 @@
   #define PRINTF(...) printf(__VA_ARGS__)
   #define CARRIAGERETURN "\r"
 #endif
+#include <fstream>
 
 using namespace std;
 
