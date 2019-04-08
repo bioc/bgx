@@ -21,16 +21,17 @@
 
 #define FULLTRACES 0
 
-#include "rand.hh"
-#include "rundir.hh"
-#include "qnorm.h"
-#include "sokal.hh"
-#include "bgx_updates.hh"
 #include <string>
 #include <iostream>
 #include <valarray>
 #include <vector>
 #include <time.h>
+#include <fstream>
+#include "rand.hh"
+#include "rundir.hh"
+#include "qnorm.h"
+#include "sokal.hh"
+#include "bgx_updates.hh"
 #include "bgx.hh"
 #include "pnorm.hh"
 
@@ -68,7 +69,6 @@
   #define PRINTF(...) printf(__VA_ARGS__)
   #define CARRIAGERETURN "\r"
 #endif
-#include <fstream>
 
 using namespace std;
 
