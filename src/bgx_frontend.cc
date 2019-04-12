@@ -19,7 +19,9 @@
  */
 
 #include <iostream>
+#ifndef __linux__
 #include <fstream>
+#endif
 #include <string>
 #include <cstring>
 #include <vector>
@@ -52,6 +54,9 @@
   #define CARRIAGERETURN "\r"
 #endif
 
+#ifdef __linux__
+#include <fstream>
+#endif
 using namespace std;
 
 enum { MINIMAL, TRACE, ALL}; 

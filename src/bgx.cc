@@ -26,7 +26,9 @@
 #include <valarray>
 #include <vector>
 #include <time.h>
+#ifndef __linux__
 #include <fstream>
+#endif
 #include "rand.hh"
 #include "rundir.hh"
 #include "qnorm.h"
@@ -70,6 +72,9 @@
   #define CARRIAGERETURN "\r"
 #endif
 
+#ifdef __linux__
+#include <fstream>
+#endif
 using namespace std;
 
 enum { MINIMAL, BGXTRACE, ALL};
